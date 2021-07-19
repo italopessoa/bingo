@@ -1,0 +1,25 @@
+{
+  "name": "bingo",
+  "version": "1.0.0",
+  "description": "Bingo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/italopessoa/bingo.git"
+  },
+  "keywords": [
+    "bingo",
+    "lambda",
+    "aws",
+    "stepfunctions"
+  ],
+  "author": "italopessoa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/italopessoa/bingo/issues"
+  },
+  "homepage": "https://github.com/italopessoa/bingo#readme"
+}
