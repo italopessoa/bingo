@@ -70,7 +70,7 @@ const generateCard = async (userId, username) => {
                     card: userCard.join('-'),
                     userName: username
                 },
-                ConditionExpression: 'attribute_not_exists(cardHash)',
+                ConditionExpression: 'attribute_not_exists(cardHash) AND attribute_not_exists(userId)',
                 ReturnValues: "ALL_OLD",
                 ReturnItemCollectionMetrics: "SIZE"
             };

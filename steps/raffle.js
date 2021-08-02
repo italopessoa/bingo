@@ -38,11 +38,11 @@ const pickRandomNumber = (numbers) => {
 }
 
 const postSelectedNumber = async (group, number) => {
-    var numberMedia = await createMedia(number);
-    var groupMedia = await createMedia(group);
+    //var numberMedia = await createMedia(number);
+    //var groupMedia = await createMedia(group);
     return await oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
-        status: `Na letra ${group}: ${number}`,
-        media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
+        status: `Na letra ${group}: ${number}`//,
+        //media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
     }, 'application/x-www-form-urlencoded');
 }
 
@@ -64,16 +64,20 @@ const updateNumbers = async (numbers, selectedNumber) => {
 }
 
 const callBallHandler = async (state) => {
+    let calledNumbers = state.calledNumbers ?? [];
     let numbers = await getNumbers();
     let selectedNumber = pickRandomNumber(numbers);
     let group = getGroup(selectedNumber);
     var numberCall = await postSelectedNumber(group, selectedNumber);
     await updateNumbers(numbers, selectedNumber);
+    calledNumbers.push(selectedNumber);
 
     return {
         ...state,
         lastCallDate: new Date(numberCall.created_at).toISOString(),
         count: 1 + (state.count ?? 0),
+        calledNumbers,
+        publishedMessages: [...state.publishedMessages, numberCall.id_str]
     }
 }
 

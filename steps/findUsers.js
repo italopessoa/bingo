@@ -7,7 +7,7 @@ const findUsersHandler = async (state) => {
     var current = currentUsers ?? [];
     let newUsers = (await getRetweets(ads_tweet)).ids.filter(item => current.indexOf(item) < 0);
     return {
-        ..state,
+        ...state,
         currentUsers: current.concat(newUsers),
         newUsers
     };

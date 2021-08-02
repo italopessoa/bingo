@@ -12,7 +12,11 @@ const publishBingoAdvertisiment = async (state) => {
         status: new Date().toISOString()
     }, 'application/x-www-form-urlencoded');
 
-    return { ads_tweet: response.id_str, id: response.id, start_time: ts,start_time_z: v.toISOString() }
+    return { 
+        publishedMessages: [
+            response.id_str
+        ], 
+        ads_tweet: response.id_str, id: response.id, start_time: ts,start_time_z: v.toISOString() }
 }
 
 exports.publishBingoAdvertisiment = publishBingoAdvertisiment;

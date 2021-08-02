@@ -2,9 +2,10 @@ const { oauthPost } = require('../oauth-utils');
 
 const destroyMessagesHandler = async (state) => {
     console.log("DESTROY MESSAGE");
-    console.log(`https://api.twitter.com/1.1/statuses/destroy/${state.ads_tweet}.json`)
-    await oauthPost(`https://api.twitter.com/1.1/statuses/destroy/${state.ads_tweet}.json`)
-    console.log("MESSAGE DESTROYED");
+    for (let message of (state.publishedMessages ?? [])) {
+        await oauthPost(`https://api.twitter.com/1.1/statuses/destroy/${message}.json`);
+        console.log("MESSAGE DESTROYED ", message);
+    }
     return state;
 }
 

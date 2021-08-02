@@ -4,7 +4,8 @@ const {
     publishBingoAdvertisiment,
     destroyMessagesHandler,
     callBallHandler,
-    findWinnerHandler 
+    findWinnerHandler,
+    notifyWinnersHandler
 } = require('./steps')
 
 exports.handler = async ({ state, nextStep }) => {
@@ -23,12 +24,14 @@ exports.handler = async ({ state, nextStep }) => {
         case 'checkWinner':
             newState = await findWinnerHandler(state);
             break;
+        case 'notifyWinners':
+            newState = await notifyWinnersHandler(state);
+            break;
+        case 'finish':
+            newState = await destroyMessagesHandler(state);
+            break;
         default:
-            if (state && state.ads_message) {
-                newState = await destroyMessagesHandler(state);
-            } else {
-                newState = await publishBingoAdvertisiment(state);
-            }
+            newState = await publishBingoAdvertisiment(state);
             break;
     }
 
