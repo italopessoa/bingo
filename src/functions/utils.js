@@ -3,31 +3,31 @@ const { oauthGet } = require('./oauth-utils');
 var board = [
     {
         min: 1,
-        max: 15,
+        max: 5,
         key: 'B',
         cardMax: 5
     },
     {
-        min: 16,
-        max: 30,
+        min: 6,
+        max: 10,
         key: 'I',
         cardMax: 5
     },
     {
-        min: 31,
-        max: 45,
+        min: 11,
+        max: 15,
         key: 'N',
         cardMax: 4
     },
     {
-        min: 46,
-        max: 60,
+        min: 16,
+        max: 20,
         key: 'G',
         cardMax: 5
     },
     {
-        min: 61,
-        max: 75,
+        min: 21,
+        max: 25,
         key: 'O',
         cardMax: 5
     }

@@ -1,7 +1,7 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
-const { oauthPost } = require('../oauth-utils');
-const { board, images } = require('../utils');
+const { oauthPost } = require('../../oauth-utils');
+const { board, images } = require('../../utils');
 
 const createMedia = (text) => oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
         media_data: images[text],
@@ -24,7 +24,7 @@ const getNumbers = async () => {
     let numbers = [];
 
     if (response.Count == 0) {
-        numbers = [...Array(75)]
+        numbers = [...Array(25)]
             .map((item, currentIndex) => currentIndex + 1)
             .sort(() => 0.5 - Math.random());
     } else {

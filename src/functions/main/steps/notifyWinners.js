@@ -1,7 +1,6 @@
-const { oauthPost } = require('../oauth-utils');
+const { oauthPost } = require('../../oauth-utils');
 
 const notifyWinnersHandler = async (state) => {
-    console.log("[notifyWinnersHandler] ************");
     let messages = []
     for (let item of (state.winnersList ?? [])) {
         var body = {
@@ -11,7 +10,6 @@ const notifyWinnersHandler = async (state) => {
         console.log(body);
         var response = await oauthPost('https://api.twitter.com/1.1/statuses/update.json', body , 'application/x-www-form-urlencoded');
         messages.push(response.id_str);
-        console.log("UPDATE ",messages)
     }
 
     return { 

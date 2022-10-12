@@ -1,4 +1,4 @@
-const { oauthPost } = require('../oauth-utils');
+const { oauthPost } = require('../../oauth-utils');
 
 var add_minutes = function (dt, minutes) {
     return new Date(dt.getTime() + minutes * 60000);
