@@ -1,0 +1,238 @@
+{
+    "Comment": "Bau da felicidade",
+    "StartAt": "Vender as cartelas",
+    "States": {
+      "Vender as cartelas": {
+        "Type": "Task",
+        "Resource": "${BingoMainFunctionArn}",
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Waiting users",
+        "ResultSelector": {
+          "state.$": "$.Payload.body.state",
+          "nextStep": "findUsers"
+        }
+      },
+      "Waiting users": {
+        "Type": "Wait",
+        "Seconds": 15,
+        "Next": "Check subscriptions"
+      },
+      "Check subscriptions": {
+        "Type": "Task",
+        "Resource": "${BingoMainFunctionArn}",
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Pass (1)",
+        "ResultSelector": {
+          "state.$": "$.Payload.body.state",
+          "nextStep": "createCards"
+        }
+      },
+      "Pass (1)": {
+        "Type": "Pass",
+        "Next": "Criar cartelas"
+      },
+      "Criar cartelas": {
+        "Type": "Task",
+        "Resource": "${BingoMainFunctionArn}",
+        "Parameters": {
+          "Payload.$": "$"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "TimeoutSeconds": 15,
+        "Next": "Check waiting time",
+        "ResultSelector": {
+          "state.$": "$.Payload.body.state",
+          "nextStep": "findUsers"
+        }
+      },
+      "Check waiting time": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "And": [
+              {
+                "Variable": "$.state.current_time_z",
+                "TimestampGreaterThanPath": "$.state.start_time_z"
+              }
+            ],
+            "Next": "Pass"
+          }
+        ],
+        "Default": "Waiting users"
+      },
+      "Pass": {
+        "Type": "Pass",
+        "Next": "Call ball",
+        "Result": "callBall",
+        "ResultPath": "$.nextStep"
+      },
+      "Call ball": {
+        "Type": "Task",
+        "Resource": "${BingoMainFunctionArn}",
+        "Parameters": {
+          "Payload.$": "$"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Choice (1)",
+        "ResultSelector": {
+          "state.$": "$.Payload.body.state",
+          "nextStep": "checkWinner"
+        }
+      },
+      "Choice (1)": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.state.count",
+            "NumericEquals": 24,
+            "Next": "Pass (2)"
+          }
+        ],
+        "Default": "Pass (3)"
+      },
+      "Pass (2)": {
+        "Type": "Pass",
+        "Next": "Destroy messages",
+        "Result": "finish",
+        "ResultPath": "$.nextStep"
+      },
+      "Pass (3)": {
+        "Type": "Pass",
+        "Next": "Wait 10 seconds",
+        "ResultPath": "$.nextStep",
+        "Result": "checkWinner"
+      },
+      "Wait 10 seconds": {
+        "Type": "Wait",
+        "Seconds": 15,
+        "Next": "Check winner"
+      },
+      "Check winner": {
+        "Type": "Task",
+        "Resource": "${BingoMainFunctionArn}",
+        "Parameters": {
+          "Payload.$": "$"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Choice",
+        "ResultSelector": {
+          "state.$": "$.Payload.body.state",
+          "nextStep": "callBall"
+        }
+      },
+      "Choice": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.state.hasWinner",
+            "BooleanEquals": true,
+            "Next": "Pass (4)"
+          }
+        ],
+        "Default": "Call ball"
+      },
+      "Pass (4)": {
+        "Type": "Pass",
+        "Next": "Notify winner",
+        "ResultPath": "$.nextStep",
+        "Result": "notifyWinners"
+      },
+      "Notify winner": {
+        "Type": "Task",
+        "Resource": "${BingoMainFunctionArn}",
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "ResultSelector": {
+          "state.$": "$.Payload.body.state",
+          "nextStep": "finish"
+        },
+        "Next": "Destroy messages"
+      },
+      "Destroy messages": {
+        "Type": "Task",
+        "Resource": "${BingoMainFunctionArn}",
+        "OutputPath": "$.Payload",
+        "Parameters": {
+          "Payload.$": "$"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "End": true
+      }
+    }
+  }
