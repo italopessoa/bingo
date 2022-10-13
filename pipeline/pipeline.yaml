@@ -137,7 +137,7 @@ Resources:
                       Configuration:
                         Owner: !Ref GithubUser
                         Repo: !Ref GithubRepo
-                        Branch: main
+                        Branch: dev
                         OAuthToken: !Ref GithubToken
                       OutputArtifacts:
                         - Name: SourceCodeAsZip
@@ -172,6 +172,10 @@ Resources:
                         ChangeSetName: sam-bingo-app-ChangeSet-Beta
                         TemplatePath: BuildArtifactAsZip::packaged.yaml
                         Capabilities: CAPABILITY_IAM
+                        ParameterOverrides: !Sub |
+                          {
+                            "nome": "${BuildArtifactsBucket}"
+                          }
                       InputArtifacts:
                         - Name: BuildArtifactAsZip
                       RunOrder: 1
