@@ -190,6 +190,10 @@ Resources:
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                         StackName: sam-bingo-app-Beta
                         ChangeSetName: sam-bingo-app-ChangeSet-Beta
+                        ParameterOverrides: !Sub |
+                          {
+                            "nome": "${BuildArtifactsBucket}"
+                          }
                       OutputArtifacts:
                         - Name: sam-bingo-appBetaChangeSet
                       RunOrder: 2
