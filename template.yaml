@@ -1,12 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Create simple lambda function.
+
+Parameters:
+  nome:
+    Description:  asdasd
+    Type: String
+    Default: jose
 Resources:
 
   BingoStateMachine:
     Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
     Properties:
-      DefinitionUri: src/statemachine/bingo.json
+      DefinitionUri: statemachine/bingo.json
       DefinitionSubstitutions:
         BingoMainFunctionArn: !GetAtt BingoMainFunction.Arn
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
@@ -26,10 +32,11 @@ Resources:
       #   - arn:aws:lambda:sa-east-1:134621539640:layer:structured-log:1
       Environment:
         Variables:
-          CONSUMER_KEY: consumer_key
-          CONSUMER_SECRET: consumer_secret
-          SECRET: secret
-          TOKEN: token
+          CONSUMER_KEY: 4
+          CONSUMER_SECRET: 3
+          SECRET: 2
+          TOKEN: 1
+          NOME: !Ref nome
     Metadata:
       SamResourceId: bingoLambda
 
