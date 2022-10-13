@@ -166,7 +166,7 @@ Resources:
                         Version: "1"
                       Configuration:
                       # More info on Possible Values for Cloudformation: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-action-reference.html#w2ab2c13c13b9
-                        ActionMode: CHANGE_SET_REPLACE
+                        ActionMode: CREATE_UPDATE
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                         StackName: sam-bingo-app-Beta
                         ChangeSetName: sam-bingo-app-ChangeSet-Beta
