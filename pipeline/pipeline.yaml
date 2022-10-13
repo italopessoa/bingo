@@ -172,6 +172,10 @@ Resources:
                         ChangeSetName: sam-bingo-app-ChangeSet-Beta
                         TemplatePath: BuildArtifactAsZip::packaged.yaml
                         Capabilities: CAPABILITY_IAM
+                        Parameters: !Sub |
+                          {
+                            "nome": "aaaaaaaaaaaaaa"
+                          }
                         ParameterOverrides: !Sub |
                           {
                             "nome": "llllllllllllllllllllllllllllllllllllllllllllllll"
