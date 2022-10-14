@@ -4,10 +4,10 @@
     "States": {
       "Vender as cartelas": {
         "Type": "Task",
-        "Resource": "${BingoMainFunctionArn}",
-        "OutputPath": "$.Payload",
-        "Parameters":{
-          "Payload.$": "$"
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "Parameters": {
+          "Payload.$": "$",
+          "FunctionName": "${BingoMainFunctionArn}"
         },
         "Retry": [
           {
