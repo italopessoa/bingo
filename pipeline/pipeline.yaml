@@ -23,13 +23,13 @@ Parameters:
       Description: Twitter app consumer key
       Type: AWS::SSM::Parameter::Value<String>
       NoEcho: true
-      Default: BSTjgCFuw3UBq27dI1uv4frz1
+      Default: /bingo-app/parameters/TwitterConsumerKey
 
     TwitterConsumerSecret: 
       Description: Twitter app consumer secret
       Type: AWS::SSM::Parameter::Value<String>
       NoEcho: true
-      Default: /bingo-app/parameters/TwitterConsumerKey
+      Default: /bingo-app/parameters/TwitterConsumerSecret
 
     TwitterAppSecret: 
       Description: Twitter app secret
@@ -42,10 +42,6 @@ Parameters:
       Type: AWS::SSM::Parameter::Value<String>
       NoEcho: true
       Default: /bingo-app/parameters/TwitterAppToken
-
-      # Type: AWS::SSM::Parameter::Value<String>
-      # Default: /service/{{cookiecutter.project_name.lower().replace(' ', '-')}}/github/repo
-
 
 Resources:
 
@@ -71,6 +67,9 @@ Resources:
               Value: !Ref AWS::StackName
             -
               Key: "Project"
+              Value: sam-bingo-app
+            -
+              Key: "trigger"
               Value: sam-bingo-app
         DeletionPolicy: Retain
         UpdateReplacePolicy: Retain

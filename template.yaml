@@ -58,3 +58,56 @@ Resources:
     Metadata:
       SamResourceId: bingoLambda
 
+  BingoTicketTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: TicketHash
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: TicketHash
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacittUnits: "5"
+        WriteCapacityUnits: "5" 
+      TableName: bingo-ticket
+      Tags:
+        - Key: Project
+          Value: sam-bingo-app
+
+  BingoRaffleTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: raffle
+          AttributeType: "S"
+        - 
+          AttributeName: date
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: raffle
+          KeyType: "HASH"
+        - 
+          AttributeName: date
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5" 
+      TableName: bingo-raffle
+      Tags:
+        - Key: Project
+          Value: sam-bingo-app
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: BingoMainFunction
+      Destination:
+        Id: BingoRaffleTable
+      Permissions:
+        - Write
