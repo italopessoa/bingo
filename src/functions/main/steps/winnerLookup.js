@@ -11,7 +11,7 @@ const getUserCard = async (user_id, message_id_str) => {
             ":userId": user_id
         },
         FilterExpression: "userId = :userId", 
-        TableName: "bingo_cards2"
+        TableName: "BingoTicket"
     };
     
     var result = await dynamodb.scan(params).promise();

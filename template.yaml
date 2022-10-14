@@ -72,7 +72,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5 
-      TableName: bingo-ticket
+      TableName: BingoTicket
       Tags:
         - Key: Project
           Value: sam-bingo-app
@@ -97,7 +97,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5 
-      TableName: bingo-raffle
+      TableName: BingoRaffle
       Tags:
         - Key: Project
           Value: sam-bingo-app
@@ -109,5 +109,15 @@ Resources:
         Id: BingoMainFunction
       Destination:
         Id: BingoRaffleTable
+      Permissions:
+        - Write
+
+  MainFunctionTicketTableConnection:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: BingoMainFunction
+      Destination:
+        Id: BingoTicketTable
       Permissions:
         - Write

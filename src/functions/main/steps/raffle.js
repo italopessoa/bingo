@@ -12,7 +12,7 @@ const getGroup = (n) => board.filter(i => n >= i.min && n <= i.max)[0].key;
 
 const getNumbers = async () => {
     var response = await dynamodb.query({
-        TableName: "raffle",
+        TableName: "BingoRaffle",
         KeyConditionExpression: "raffle = :date",
         ExpressionAttributeValues: {
             ":date": new Date().toLocaleDateString('pt-BR'),
@@ -49,7 +49,7 @@ const postSelectedNumber = async (group, number) => {
 const updateNumbers = async (numbers, selectedNumber) => {
 
     var params = {
-        TableName: "raffle",
+        TableName: "BingoRaffle",
         Item: {
             raffle: new Date().toLocaleDateString('pt-BR'),
             date: new Date().toISOString(),
