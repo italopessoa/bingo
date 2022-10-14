@@ -70,8 +70,8 @@ Resources:
           AttributeName: TicketHash
           KeyType: "HASH"
       ProvisionedThroughput:
-        ReadCapacittUnits: "5"
-        WriteCapacityUnits: "5" 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5 
       TableName: bingo-ticket
       Tags:
         - Key: Project
@@ -95,14 +95,14 @@ Resources:
           AttributeName: date
           KeyType: "RANGE"
       ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5" 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5 
       TableName: bingo-raffle
       Tags:
         - Key: Project
           Value: sam-bingo-app
 
-  MyConnector:
+  MainFunctionRaffleTableConnection:
     Type: AWS::Serverless::Connector
     Properties:
       Source:
