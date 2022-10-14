@@ -5,6 +5,7 @@
       "Vender as cartelas": {
         "Type": "Task",
         "Resource": "${BingoMainFunctionArn}",
+        "OutputPath": "$.Payload",
         "Parameters":{
           "Payload.$": "$"
         },
