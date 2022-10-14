@@ -3,10 +3,29 @@ Transform: AWS::Serverless-2016-10-31
 Description: Create simple lambda function.
 
 Parameters:
-  nome:
-    Description:  asdasd
-    Type: String
-    Default: jose
+    TwitterConsumerKey: 
+      Description: Twitter app consumer key
+      Type: String
+      NoEcho: true
+      Default: ''
+
+    TwitterConsumerSecret: 
+      Description: Twitter app consumer secret
+      Type: String
+      NoEcho: true
+      Default: ''
+
+    TwitterAppSecret: 
+      Description: Twitter app secret
+      Type: String
+      NoEcho: true
+      Default: ''
+
+    TwitterAppToken: 
+      Description: Twitter app token
+      Type: String 
+      NoEcho: true
+      Default: ''
 Resources:
 
   BingoStateMachine:
@@ -32,11 +51,10 @@ Resources:
       #   - arn:aws:lambda:sa-east-1:134621539640:layer:structured-log:1
       Environment:
         Variables:
-          CONSUMER_KEY: 4
-          CONSUMER_SECRET: 3
-          SECRET: 2
-          TOKEN: 1
-          NOME: !Ref nome
+          CONSUMER_KEY: !Ref TwitterConsumerKey
+          CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          SECRET: !Ref TwitterAppSecret
+          TOKEN: !Ref TwitterAppToken
     Metadata:
       SamResourceId: bingoLambda
 
