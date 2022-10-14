@@ -111,6 +111,7 @@ Resources:
         Id: BingoRaffleTable
       Permissions:
         - Write
+        - Read
 
   MainFunctionTicketTableConnection:
     Type: AWS::Serverless::Connector
@@ -121,3 +122,4 @@ Resources:
         Id: BingoTicketTable
       Permissions:
         - Write
+        - Read
