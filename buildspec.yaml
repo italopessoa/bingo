@@ -35,7 +35,6 @@ phases:
     on-failure: ABORT
     commands:
       - echo "Starting SAM packaging `date` in `pwd` `$BUILD_OUTPUT_BUCKET`"
-      - sam build --parameter-overrides nome=italo
       - >
         aws cloudformation package 
         --template-file template.yaml 
