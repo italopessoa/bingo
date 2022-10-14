@@ -34,7 +34,11 @@
       },
       "Check subscriptions": {
         "Type": "Task",
-        "Resource": "${BingoMainFunctionArn}",
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "Parameters": {
+          "Payload.$":"$",
+          "FunctionName":"${BingoMainFunctionArn}"
+        },
         "Retry": [
           {
             "ErrorEquals": [
@@ -59,9 +63,10 @@
       },
       "Criar cartelas": {
         "Type": "Task",
-        "Resource": "${BingoMainFunctionArn}",
+        "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
-          "Payload.$": "$"
+          "Payload.$":"$",
+          "FunctionName":"${BingoMainFunctionArn}"
         },
         "Retry": [
           {
@@ -105,9 +110,10 @@
       },
       "Call ball": {
         "Type": "Task",
-        "Resource": "${BingoMainFunctionArn}",
+        "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
-          "Payload.$": "$"
+          "Payload.$":"$",
+          "FunctionName":"${BingoMainFunctionArn}"
         },
         "Retry": [
           {
@@ -157,9 +163,10 @@
       },
       "Check winner": {
         "Type": "Task",
-        "Resource": "${BingoMainFunctionArn}",
+        "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
-          "Payload.$": "$"
+          "Payload.$":"$",
+          "FunctionName":"${BingoMainFunctionArn}"
         },
         "Retry": [
           {
@@ -198,7 +205,11 @@
       },
       "Notify winner": {
         "Type": "Task",
-        "Resource": "${BingoMainFunctionArn}",
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "Parameters": {
+          "Payload.$":"$",
+          "FunctionName":"${BingoMainFunctionArn}"
+        },
         "Retry": [
           {
             "ErrorEquals": [
@@ -219,11 +230,12 @@
       },
       "Destroy messages": {
         "Type": "Task",
-        "Resource": "${BingoMainFunctionArn}",
-        "OutputPath": "$.Payload",
+        "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
-          "Payload.$": "$"
+          "Payload.$":"$",
+          "FunctionName":"${BingoMainFunctionArn}"
         },
+        "OutputPath": "$.Payload",
         "Retry": [
           {
             "ErrorEquals": [

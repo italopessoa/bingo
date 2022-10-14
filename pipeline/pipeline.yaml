@@ -1,14 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >
-    This template generates a generic 3-environment CI/CD Pipeline for Serverless Apps that use SAM (Serverless Application Model).
-    Charges may apply for AWS Services utilized - Below are a summary for your convenience:
-      {% if cookiecutter.source_code_repo == "CodeCommit" %}AWS CodeCommit{% else %}GitHub{% endif %}: Manages and Stores your service source code (Git repository)
-      Amazon S3: Manages CodeBuild Artifacts as well as Cache for subsequent runs when defined in the build spec
-      AWS CodeBuild: Manages and Runs builds specified under buildspec.yaml
-      AWS CodePipeline: Manages and Runs the Continuous Integration and Continuous Deployment pipeline
-      AWS CloudFormation: Manages SAM templates and creates the Infrastructure necessary for each environment
-      AWS IAM: Manages Identity and Access across Services outlined above
-
+Description: creates 3 stages pipeline
 
 Parameters:
 
@@ -19,14 +10,41 @@ Parameters:
 
     GithubToken:
       Description: Github OAuth Token with full permissions on admin:repo_hook and repo
-      Type: String
+      Type: AWS::SSM::Parameter::Value<String>
       NoEcho: true
-      Default: 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
+      Default: /bingo-app/parameters/GithubToken
 
     GithubUser:
       Description: Github user where the repository lives
       Type: String
-      Default: italopessoa 
+      Default: italopessoa
+
+    TwitterConsumerKey: 
+      Description: Twitter app consumer key
+      Type: AWS::SSM::Parameter::Value<String>
+      NoEcho: true
+      Default: BSTjgCFuw3UBq27dI1uv4frz1
+
+    TwitterConsumerSecret: 
+      Description: Twitter app consumer secret
+      Type: AWS::SSM::Parameter::Value<String>
+      NoEcho: true
+      Default: /bingo-app/parameters/TwitterConsumerKey
+
+    TwitterAppSecret: 
+      Description: Twitter app secret
+      Type: AWS::SSM::Parameter::Value<String>
+      NoEcho: true
+      Default: /bingo-app/parameters/TwitterAppSecret
+
+    TwitterAppToken: 
+      Description: Twitter app token
+      Type: AWS::SSM::Parameter::Value<String>
+      NoEcho: true
+      Default: /bingo-app/parameters/TwitterAppToken
+
+      # Type: AWS::SSM::Parameter::Value<String>
+      # Default: /service/{{cookiecutter.project_name.lower().replace(' ', '-')}}/github/repo
 
 
 Resources:
@@ -81,18 +99,6 @@ Resources:
                   - 
                     Name: BUILD_OUTPUT_BUCKET
                     Value: !Ref BuildArtifactsBucket
-                  -
-                    Name: CONSUMER_KEY
-                    Value: 1
-                  -
-                    Name: CONSUMER_SECRET
-                    Value: 2
-                  -
-                    Name: SECRET
-                    Value: 3
-                  -
-                    Name: TOKEN
-                    Value: 4
             Cache:
               Type: S3
               Location: !Sub ${BuildArtifactsBucket}/codebuild-cache
@@ -172,13 +178,12 @@ Resources:
                         ChangeSetName: sam-bingo-app-ChangeSet-Beta
                         TemplatePath: BuildArtifactAsZip::packaged.yaml
                         Capabilities: CAPABILITY_IAM
-                        Parameters:
-                          -
-                            ParameterKey: nome
-                            ParameterValue: jhondoe
                         ParameterOverrides: !Sub |
                           {
-                            "nome": "llllllllllllllllllllllllllllllllllllllllllllllll"
+                            "TwitterConsumerKey": "${TwitterConsumerKey}",
+                            "TwitterConsumerSecret": "${TwitterConsumerSecret}",
+                            "TwitterAppSecret": "${TwitterAppSecret}",
+                            "TwitterAppToken": "${TwitterAppToken}"
                           }
                       InputArtifacts:
                         - Name: BuildArtifactAsZip
