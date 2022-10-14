@@ -27,9 +27,9 @@ phases:
       nodejs: 14
       # name: version
       # - command
-  #pre_build:
-    #commands:
-      # - command
+  pre_build:
+    commands:
+      - npm install
       # - command
   build:
     on-failure: ABORT
