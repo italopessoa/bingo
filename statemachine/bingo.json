@@ -5,6 +5,9 @@
       "Vender as cartelas": {
         "Type": "Task",
         "Resource": "${BingoMainFunctionArn}",
+        "Parameters":{
+          "Payload.$": "$"
+        },
         "Retry": [
           {
             "ErrorEquals": [
