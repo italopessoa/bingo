@@ -18,7 +18,7 @@ const publishBingoPosterHandler = async (state) => {
         ads_tweet: response.id_str,
         id: response.id,
         start_time: bingoStartTimeEpoch,
-        start_time_z: bingoStartTimeEpoch.toISOString()
+        start_time_z: bingoStartTime.toISOString()
     }
 }
 
