@@ -69,8 +69,8 @@ const callBallHandler = async (state) => {
     let numbers = await getBingoNumbers();
     let selectedNumber = pickRandomNumber(numbers);
     let group = getNumberGroup(selectedNumber);
-    var numberCall = await postSelectedNumber(group, selectedNuber);
-    await updateNumbers(nubers, selectedNumber);
+    var numberCall = await postSelectedNumber(group, selectedNumber);
+    await updateNumbers(numbers, selectedNumber);
     calledNumbers.push(selectedNumber);
 
     return {
