@@ -63,7 +63,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: src/functions/BingoBanne/app.handler
+      Handler: src/functions/BingoBanner/app.handler
       Runtime: nodejs14.x
       PackageType: Zip
       Timeout: 120
