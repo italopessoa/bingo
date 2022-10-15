@@ -135,11 +135,9 @@ exports.handler = async ({ state }) => {
         }
     };
     return {
-        state: {
-            ...state,
-            currentUsers: currentUsers.filter(x => tmpInvalidUsers.indexOf(x) < 0),
-            invalidUsers: tmpInvalidUsers,
-            current_time_z: new Date().toISOString(),
-        }
+        ...state,
+        currentUsers: currentUsers.filter(x => tmpInvalidUsers.indexOf(x) < 0),
+        invalidUsers: tmpInvalidUsers,
+        current_time_z: new Date().toISOString(),
     }
 }

@@ -1,8 +1,8 @@
 {
     "Comment": "Bau da felicidade",
-    "StartAt": "Vender as cartelas",
+    "StartAt": "Post bingo description",
     "States": {
-      "Vender as cartelas": {
+      "Post bingo description": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
@@ -21,18 +21,18 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Waiting users",
+        "Next": "Wait for players subscription",
         "ResultSelector": {
           "state.$": "$.Payload.body.state",
           "nextStep": "findUsers"
         }
       },
-      "Waiting users": {
+      "Wait for players subscription": {
         "Type": "Wait",
         "Seconds": 15,
-        "Next": "Check subscriptions"
+        "Next": "Register players"
       },
-      "Check subscriptions": {
+      "Register players": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
@@ -59,9 +59,9 @@
       },
       "Pass (1)": {
         "Type": "Pass",
-        "Next": "Criar cartelas"
+        "Next": "Create tickets"
       },
-      "Criar cartelas": {
+      "Create tickets": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
@@ -81,13 +81,13 @@
           }
         ],
         "TimeoutSeconds": 15,
-        "Next": "Check waiting time",
+        "Next": "Wait for more players before start time",
         "ResultSelector": {
-          "state.$": "$.Payload.state",
+          "state.$": "$.Payload",
           "nextStep": "findUsers"
         }
       },
-      "Check waiting time": {
+      "Wait for more players before start time": {
         "Type": "Choice",
         "Choices": [
           {
@@ -100,15 +100,15 @@
             "Next": "Pass"
           }
         ],
-        "Default": "Waiting users"
+        "Default": "Wait for players subscription"
       },
       "Pass": {
         "Type": "Pass",
-        "Next": "Call ball",
+        "Next": "Numbers draw",
         "Result": "callBall",
         "ResultPath": "$.nextStep"
       },
-      "Call ball": {
+      "Numbers draw": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
@@ -129,7 +129,7 @@
         ],
         "Next": "Choice (1)",
         "ResultSelector": {
-          "state.$": "$.Payload.state",
+          "state.$": "$.Payload",
           "nextStep": "checkWinner"
         }
       },
@@ -159,14 +159,14 @@
       "Wait 10 seconds": {
         "Type": "Wait",
         "Seconds": 15,
-        "Next": "Check winner"
+        "Next": "Try to find a winner"
       },
-      "Check winner": {
+      "Try to find a winner": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
           "Payload.$":"$",
-          "FunctionName":"${BingoMainFunctionArn}"
+          "FunctionName":"${FindWinnerFunctionArn}"
         },
         "Retry": [
           {
@@ -182,7 +182,7 @@
         ],
         "Next": "Choice",
         "ResultSelector": {
-          "state.$": "$.Payload.body.state",
+          "state.$": "$.Payload",
           "nextStep": "callBall"
         }
       },
@@ -195,7 +195,7 @@
             "Next": "Pass (4)"
           }
         ],
-        "Default": "Call ball"
+        "Default": "Numbers draw"
       },
       "Pass (4)": {
         "Type": "Pass",
@@ -208,7 +208,7 @@
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
           "Payload.$":"$",
-          "FunctionName":"${BingoMainFunctionArn}"
+          "FunctionName":"${NotifyWinnerFunctionArn}"
         },
         "Retry": [
           {
@@ -223,7 +223,7 @@
           }
         ],
         "ResultSelector": {
-          "state.$": "$.Payload.body.state",
+          "state.$": "$.Payload",
           "nextStep": "finish"
         },
         "Next": "Destroy messages"

@@ -64,7 +64,7 @@ const updateNumbers = async (numbers, selectedNumber) => {
     await dynamodb.put(params).promise();
 }
 
-exports.handler = async ({ state }) => {
+exports.handler = async (state) => {
     let calledNumbers = state.calledNumbers ?? [];
     let numbers = await getBingoNumbers();
     let selectedNumber = pickRandomNumber(numbers);
@@ -74,12 +74,10 @@ exports.handler = async ({ state }) => {
     calledNumbers.push(selectedNumber);
 
     return {
-        state: {
-            ...state,
-            lastCallDate: new Date(numberCall.created_at).toISOString(),
-            count: 1 + (state.count ?? 0),
-            calledNumbers,
-            publishedMessages: [...state.publishedMessages, numberCall.id_str]
-        }
+        ...state,
+        lastCallDate: new Date(numberCall.created_at).toISOString(),
+        count: 1 + (state.count ?? 0),
+        calledNumbers,
+        publishedMessages: [...state.publishedMessages, numberCall.id_str]
     }
 }
