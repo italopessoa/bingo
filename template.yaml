@@ -39,6 +39,22 @@ Resources:
         - LambdaInvokePolicy:
             FunctionName: !Ref BingoMainFunction
 
+  PostBingoBanner:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/BingoBanner/app.handler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 120
+      MemorySize: 128
+      Environment:
+        Variables:
+          CONSUMER_KEY: !Ref TwitterConsumerKey
+          CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          SECRET: !Ref TwitterAppSecret
+          TOKEN: !Ref TwitterAppToken
+          
   BingoMainFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -59,21 +75,7 @@ Resources:
     Metadata:
       SamResourceId: bingoLambda
 
-  PostBingoBanner:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: .
-      Handler: src/functions/BingoBanner/app.handler
-      Runtime: nodejs14.x
-      PackageType: Zip
-      Timeout: 120
-      MemorySize: 128
-      Environment:
-        Variables:
-          CONSUMER_KEY: !Ref TwitterConsumerKey
-          CONSUMER_SECRET: !Ref TwitterConsumerSecret
-          SECRET: !Ref TwitterAppSecret
-          TOKEN: !Ref TwitterAppToken
+
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
