@@ -38,6 +38,8 @@ Resources:
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
             FunctionName: !Ref BingoMainFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref PostBingoBanner
 
   PostBingoBanner:
     Type: AWS::Serverless::Function
@@ -54,7 +56,7 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-          
+
   BingoMainFunction:
     Type: AWS::Serverless::Function
     Properties:
