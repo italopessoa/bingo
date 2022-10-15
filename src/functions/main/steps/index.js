@@ -1,4 +1,4 @@
-const { publishBingoAdvertisiment } = require('./sendBingo');
+const { publishBingoPosterHandler } = require('./sendBingo');
 const { findUsersHandler } = require('./findUsers');
 const { createCardsHandler } = require('./createCard');
 const { destroyMessagesHandler } = require('./destroyMessages');
@@ -6,7 +6,7 @@ const { callBallHandler } = require('./raffle');
 const { findWinnerHandler  } = require('./winnerLookup');
 const { notifyWinnersHandler  } = require('./notifyWinners');
 
-exports.publishBingoAdvertisiment = publishBingoAdvertisiment;
+exports.publishBingoPosterHandler = publishBingoPosterHandler;
 exports.findUsersHandler = findUsersHandler;
 exports.createCardsHandler = createCardsHandler;
 exports.destroyMessagesHandler = destroyMessagesHandler;

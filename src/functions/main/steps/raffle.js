@@ -1,16 +1,17 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
-const { oauthPost } = require('../../oauth-utils');
+const OauthService = require('../../oauth-utils');
 const { board, images } = require('../../utils');
 
-const createMedia = (text) => oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
-        media_data: images[text],
-        media_category: "tweet_image"
-    }, 'multipart/form-data');
+const createMedia = (text) => OauthService.oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
+    media_data: images[text],
+    media_category: "tweet_image"
+}, 'multipart/form-data');
 
-const getGroup = (n) => board.filter(i => n >= i.min && n <= i.max)[0].key;
+const getNumberGroup = (number) =>
+    board.filter(numberGroup => number >= numberGroup.min && number <= numberGroup.max)[0].key;
 
-const getNumbers = async () => {
+const getBingoNumbers = async () => {
     var response = await dynamodb.query({
         TableName: "BingoRaffle",
         KeyConditionExpression: "raffle = :date",
@@ -40,7 +41,7 @@ const pickRandomNumber = (numbers) => {
 const postSelectedNumber = async (group, number) => {
     //var numberMedia = await createMedia(number);
     //var groupMedia = await createMedia(group);
-    return await oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
+    return await OauthService.oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
         status: `Na letra ${group}: ${number}`//,
         //media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
     }, 'application/x-www-form-urlencoded');
@@ -65,11 +66,11 @@ const updateNumbers = async (numbers, selectedNumber) => {
 
 const callBallHandler = async (state) => {
     let calledNumbers = state.calledNumbers ?? [];
-    let numbers = await getNumbers();
+    let numbers = await getBingoNumbers();
     let selectedNumber = pickRandomNumber(numbers);
-    let group = getGroup(selectedNumber);
-    var numberCall = await postSelectedNumber(group, selectedNumber);
-    await updateNumbers(numbers, selectedNumber);
+    let group = getNumberGroup(selectedNumber);
+    var numberCall = await postSelectedNumber(group, selectedNuber);
+    await updateNumbers(nubers, selectedNumber);
     calledNumbers.push(selectedNumber);
 
     return {

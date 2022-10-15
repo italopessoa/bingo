@@ -63,14 +63,14 @@ const generateCard = async (userId, username) => {
             hash.update(cardCopy.sort((a, b) => a - b).join('-'));
             var hashBase64 = hash.digest('base64');
             var params = {
-                TableName: "bingo_cards2",
+                TableName: "BingoTicket",
                 Item: {
-                    cardHash: hashBase64,
+                    TicketHash: hashBase64,
                     userId: "" + userId + "",
                     card: userCard.join('-'),
                     userName: username
                 },
-                ConditionExpression: 'attribute_not_exists(cardHash) AND attribute_not_exists(userId)',
+                ConditionExpression: 'attribute_not_exists(TicketHash) AND attribute_not_exists(userId)',
                 ReturnValues: "ALL_OLD",
                 ReturnItemCollectionMetrics: "SIZE"
             };

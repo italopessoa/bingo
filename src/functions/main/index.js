@@ -1,7 +1,7 @@
-const { 
+const {
     findUsersHandler,
     createCardsHandler,
-    publishBingoAdvertisiment,
+    publishBingoPosterHandler,
     destroyMessagesHandler,
     callBallHandler,
     findWinnerHandler,
@@ -18,11 +18,11 @@ exports.handler = async ({ state, nextStep }) => {
         'notifyWinners': notifyWinnersHandler,
         'finish': destroyMessagesHandler
     }
-    var handler = steps[nextStep] ?? publishBingoAdvertisiment;
+    var handler = steps[nextStep] ?? publishBingoPosterHandler;
     newState = await handler(state);
 
     return {
-        body:{
+        body: {
             state: newState
         },
         statusCode: 200
