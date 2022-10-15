@@ -127,13 +127,13 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Choice (1)",
+        "Next": "Any number available?",
         "ResultSelector": {
           "state.$": "$.Payload",
           "nextStep": "checkWinner"
         }
       },
-      "Choice (1)": {
+      "Any number available?": {
         "Type": "Choice",
         "Choices": [
           {
@@ -152,11 +152,11 @@
       },
       "Pass (3)": {
         "Type": "Pass",
-        "Next": "Wait 10 seconds",
+        "Next": "Wait for player to check their tickets",
         "ResultPath": "$.nextStep",
         "Result": "checkWinner"
       },
-      "Wait 10 seconds": {
+      "Wait for player to check their tickets": {
         "Type": "Wait",
         "Seconds": 15,
         "Next": "Try to find a winner"
@@ -180,13 +180,13 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Choice",
+        "Next": "Any winner?",
         "ResultSelector": {
           "state.$": "$.Payload",
           "nextStep": "callBall"
         }
       },
-      "Choice": {
+      "Any winner?": {
         "Type": "Choice",
         "Choices": [
           {
@@ -233,7 +233,7 @@
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
           "Payload.$":"$",
-          "FunctionName":"${BingoMainFunctionArn}"
+          "FunctionName":"${DestroyMessagesFunctionArn}"
         },
         "OutputPath": "$.Payload",
         "Retry": [

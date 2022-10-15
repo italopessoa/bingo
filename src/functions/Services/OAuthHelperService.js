@@ -64,7 +64,7 @@ const validatePlayer = async (userId) => {
 }
 
 
-const getRetweetsFor = (id) => OauthService.oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
+const getRetweetsFor = (id) => oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
 
 exports.oauthGet = oauthGet;
 exports.oauthPost = oauthPost;

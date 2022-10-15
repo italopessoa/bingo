@@ -8,8 +8,10 @@ const createMedia = (text) => OauthService.oauthPost('https://upload.twitter.com
     media_category: "tweet_image"
 }, 'multipart/form-data');
 
-const getNumberGroup = (number) =>
-    board.filter(numberGroup => number >= numberGroup.min && number <= numberGroup.max)[0].key;
+const getNumberGroup = (number) => {
+    console.log(`trying to get group for number ${number}`);
+    return board.filter(numberGroup => number >= numberGroup.min && number <= numberGroup.max)[0].key;
+}
 
 const pickRandomNumber = (numbers) => {
     return numbers.sort(() => 0.5 - Math.random())[0];
