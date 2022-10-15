@@ -1,6 +1,6 @@
 {
     "Comment": "Bau da felicidade",
-    "StartAt": "Postar anuncio do bingo",
+    "StartAt": "Vender as cartelas",
     "States": {
       "Vender as cartelas": {
         "Type": "Task",
