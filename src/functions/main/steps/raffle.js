@@ -1,7 +1,7 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
-const OauthService = require('../../oauth-utils');
-const { board, images } = require('../../utils');
+const OauthService = require('../../Services/OAuthHelperService');
+const { board, images } = require('../../assets');
 
 const createMedia = (text) => OauthService.oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
     media_data: images[text],

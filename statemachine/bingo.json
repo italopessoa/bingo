@@ -23,7 +23,7 @@
         ],
         "Next": "Wait for players subscription",
         "ResultSelector": {
-          "state.$": "$.Payload.body.state",
+          "state.$": "$.Payload",
           "nextStep": "findUsers"
         }
       },
@@ -53,7 +53,7 @@
         ],
         "Next": "Pass (1)",
         "ResultSelector": {
-          "state.$": "$.Payload.body.state",
+          "state.$": "$.Payload",
           "nextStep": "createCards"
         }
       },

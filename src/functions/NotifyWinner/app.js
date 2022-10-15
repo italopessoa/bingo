@@ -1,6 +1,6 @@
-const OauthService = require('../oauth-utils');
+const OauthService = require('../Services/OAuthHelperService');
 
-exports.handler = async (state) => {
+exports.handler = async ({ state }) => {
     let messages = []
     for (let item of (state.winnersList ?? [])) {
         var body = {

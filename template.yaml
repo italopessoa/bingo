@@ -42,8 +42,6 @@ Resources:
         NotifyWinnerFunctionArn: !GetAtt NotifyWinnerFunction.Arn
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
-            FunctionName: !Ref BingoMainFunction
-        - LambdaInvokePolicy:
             FunctionName: !Ref PostBingoBannerFunction
         - LambdaInvokePolicy:
             FunctionName: !Ref FindPlayersFunction
@@ -213,28 +211,6 @@ Resources:
       Tags:
         - Key: Project
           Value: sam-bingo-app
-
-  MainFunctionRaffleTableConnection:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: BingoMainFunction
-      Destination:
-        Id: BingoRaffleTable
-      Permissions:
-        - Write
-        - Read
-
-  MainFunctionTicketTableConnection:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: BingoMainFunction
-      Destination:
-        Id: BingoTicketTable
-      Permissions:
-        - Write
-        - Read
 
   CreateTicketTableConnection:
     Type: AWS::Serverless::Connector

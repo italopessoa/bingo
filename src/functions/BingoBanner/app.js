@@ -1,4 +1,4 @@
-const OauthService = require('../oauth-utils');
+const OauthService = require('../Services/OAuthHelperService');
 
 const add_minutes = (dt, minutes) => new Date(dt.getTime() + minutes * 60000);
 
@@ -20,19 +20,14 @@ exports.handler = async (state) => {
     }, 'application/x-www-form-urlencoded');
 
     return {
-        body: {
-            state: {
-                ...state,
-                publishedMessages: [
-                    response.id_str
-                ],
-                bingo_advertise_tweet_id: response.id_str,
-                ads_tweet: response.id_str,
-                id: response.id,
-                start_time: bingoStartTimeEpoch,
-                start_time_z: bingoStartTime.toISOString()
-            }
-        },
-        statusCode: 200
-    };
+        ...state,
+        publishedMessages: [
+            response.id_str
+        ],
+        bingo_advertise_tweet_id: response.id_str,
+        ads_tweet: response.id_str,
+        id: response.id,
+        start_time: bingoStartTimeEpoch,
+        start_time_z: bingoStartTime.toISOString()
+    }
 }

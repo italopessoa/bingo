@@ -1,4 +1,4 @@
-const { oauthPost } = require('../../oauth-utils');
+const { oauthPost } = require('../../Services/OAuthHelperService');
 
 const destroyMessagesHandler = async (state) => {
     console.log("DESTROY MESSAGE");

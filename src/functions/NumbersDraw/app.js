@@ -1,7 +1,7 @@
-var AWS = require("aws-sdk");
-var dynamodb = new AWS.DynamoDB.DocumentClient();
-const OauthService = require('../oauth-utils');
-const { board, images } = require('../utils');
+const OauthService = require('../Services/OAuthHelperService');
+const DynamoDBService = require('../Services/DynamoDBHelperService');
+
+const { board, images } = require('../assets');
 
 const createMedia = (text) => OauthService.oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
     media_data: images[text],
@@ -10,29 +10,6 @@ const createMedia = (text) => OauthService.oauthPost('https://upload.twitter.com
 
 const getNumberGroup = (number) =>
     board.filter(numberGroup => number >= numberGroup.min && number <= numberGroup.max)[0].key;
-
-const getBingoNumbers = async () => {
-    var response = await dynamodb.query({
-        TableName: "BingoRaffle",
-        KeyConditionExpression: "raffle = :date",
-        ExpressionAttributeValues: {
-            ":date": new Date().toLocaleDateString('pt-BR'),
-        },
-        ScanIndexForward: false,
-        Limit: 1
-    }).promise();
-
-    let numbers = [];
-
-    if (response.Count == 0) {
-        numbers = [...Array(25)]
-            .map((item, currentIndex) => currentIndex + 1)
-            .sort(() => 0.5 - Math.random());
-    } else {
-        numbers = response.Items[0].numbers;
-    }
-    return numbers;
-}
 
 const pickRandomNumber = (numbers) => {
     return numbers.sort(() => 0.5 - Math.random())[0];
@@ -64,9 +41,9 @@ const updateNumbers = async (numbers, selectedNumber) => {
     await dynamodb.put(params).promise();
 }
 
-exports.handler = async (state) => {
+exports.handler = async ({ state }) => {
     let calledNumbers = state.calledNumbers ?? [];
-    let numbers = await getBingoNumbers();
+    let numbers = await DynamoDBService.getBingoNumbers();
     let selectedNumber = pickRandomNumber(numbers);
     let group = getNumberGroup(selectedNumber);
     var numberCall = await postSelectedNumber(group, selectedNumber);

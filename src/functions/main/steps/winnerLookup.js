@@ -1,7 +1,7 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const OauthService = require('../../oauth-utils');
+const OauthService = require('../../Services/OAuthHelperService');
 
 const searchWinners = () =>
     OauthService.oauthGet(`https://api.twitter.com/1.1/search/tweets.json?q=%23bingobati&result_type=recent`);

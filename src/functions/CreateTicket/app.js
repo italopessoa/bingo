@@ -1,8 +1,8 @@
 const crypto = require('crypto');
-const { oauthPost } = require('../oauth-utils');
-const { checkUserIsValid, board } = require('../utils')
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
+const { oauthPost, validatePlayer } = require('../Services/OAuthHelperService');
+const { board } = require('../assets')
 ;
 
 let numbers = [...Array(75)].map((item, currentIndex) => {
@@ -122,7 +122,7 @@ exports.handler = async ({ state }) => {
     for (var prop in newUsers.filter(x => tmpInvalidUsers.indexOf(x) < 0)) {
         const userId = newUsers[prop]
         try {
-            var username = await checkUserIsValid(userId);
+            var username = await validatePlayer(userId);
             if (username) {
                 var card = await generateCard(userId, username);
                 await sendMessage(userId, "sua cartela = " + card.join('-'));

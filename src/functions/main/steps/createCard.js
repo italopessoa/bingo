@@ -1,6 +1,6 @@
 const crypto = require('crypto');
-const { oauthPost } = require('../../oauth-utils');
-const { checkUserIsValid, board } = require('../../utils')
+const { oauthPost } = require('../../Services/OAuthHelperService');
+const { checkUserIsValid, board } = require('../../assets')
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
 ;

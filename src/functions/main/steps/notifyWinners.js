@@ -1,4 +1,4 @@
-const OauthService = require('../../oauth-utils');
+const OauthService = require('../../Services/OAuthHelperService');
 
 const notifyWinnersHandler = async (state) => {
     let messages = []

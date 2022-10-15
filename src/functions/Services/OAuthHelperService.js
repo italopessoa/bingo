@@ -54,5 +54,15 @@ const oauthGet = (url) => new Promise((resolve, reject) => {
         });
 });
 
+const validatePlayer = async (userId) => {
+    try {
+        var response = await oauthGet(`https://api.twitter.com/2/users/${userId}`);
+        return response.data.username;
+    } catch (error) {
+        return null;
+    }
+}
+
 exports.oauthGet = oauthGet;
 exports.oauthPost = oauthPost;
+exports.validatePlayer = validatePlayer;
