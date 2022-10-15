@@ -24,30 +24,13 @@ const postSelectedNumber = async (group, number) => {
     }, 'application/x-www-form-urlencoded');
 }
 
-const updateNumbers = async (numbers, selectedNumber) => {
-
-    var params = {
-        TableName: "BingoRaffle",
-        Item: {
-            raffle: new Date().toLocaleDateString('pt-BR'),
-            date: new Date().toISOString(),
-            numbers: numbers.filter(i => i != selectedNumber),
-            selectedNumber: selectedNumber
-        },
-        ReturnValues: "ALL_OLD",
-        ReturnItemCollectionMetrics: "SIZE"
-    };
-
-    await dynamodb.put(params).promise();
-}
-
 exports.handler = async ({ state }) => {
     let calledNumbers = state.calledNumbers ?? [];
     let numbers = await DynamoDBService.getBingoNumbers();
     let selectedNumber = pickRandomNumber(numbers);
     let group = getNumberGroup(selectedNumber);
     var numberCall = await postSelectedNumber(group, selectedNumber);
-    await updateNumbers(numbers, selectedNumber);
+    await DynamoDBService.updateNumbers(numbers, selectedNumber);
     calledNumbers.push(selectedNumber);
 
     return {

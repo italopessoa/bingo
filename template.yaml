@@ -33,13 +33,13 @@ Resources:
     Properties:
       DefinitionUri: statemachine/bingo.json
       DefinitionSubstitutions:
-        BingoMainFunctionArn: !GetAtt BingoMainFunction.Arn
         PostBingoBannerFunctionArn: !GetAtt PostBingoBannerFunction.Arn
         FindPlayersFunctionArn: !GetAtt FindPlayersFunction.Arn
         CreateTicketFunctionArn: !GetAtt CreateTicketFunction.Arn
         NumbersDrawFunctionArn: !GetAtt NumbersDrawFunction.Arn
         FindWinnerFunctionArn: !GetAtt FindWinnerFunction.Arn
         NotifyWinnerFunctionArn: !GetAtt NotifyWinnerFunction.Arn
+        DestroyMessagesFunctionArn: !GetAtt DestroyMessagesFunction.Arn
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
             FunctionName: !Ref PostBingoBannerFunction
@@ -53,24 +53,8 @@ Resources:
             FunctionName: !Ref FindWinnerFunction
         - LambdaInvokePolicy:
             FunctionName: !Ref NotifyWinnerFunction
-
-  BingoMainFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: .
-      Handler: src/functions/main/index.handler
-      Runtime: nodejs14.x
-      PackageType: Zip
-      Timeout: 120
-      MemorySize: 128
-      # Layers:
-      #   - arn:aws:lambda:sa-east-1:134621539640:layer:structured-log:1
-      Environment:
-        Variables:
-          CONSUMER_KEY: !Ref TwitterConsumerKey
-          CONSUMER_SECRET: !Ref TwitterConsumerSecret
-          SECRET: !Ref TwitterAppSecret
-          TOKEN: !Ref TwitterAppToken
+        - LambdaInvokePolicy:
+            FunctionName: !Ref DestroyMessagesFunction
 
   PostBingoBannerFunction:
     Type: AWS::Serverless::Function
@@ -157,6 +141,22 @@ Resources:
     Properties:
       CodeUri: .
       Handler: src/functions/NotifyWinner/app.handler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 120
+      MemorySize: 128
+      Environment:
+        Variables:
+          CONSUMER_KEY: !Ref TwitterConsumerKey
+          CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          SECRET: !Ref TwitterAppSecret
+          TOKEN: !Ref TwitterAppToken
+
+  DestroyMessagesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/DestroyMessages/app.handler
       Runtime: nodejs14.x
       PackageType: Zip
       Timeout: 120

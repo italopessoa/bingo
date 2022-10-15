@@ -43,5 +43,22 @@ const getBingoNumbers = async () => {
     return numbers;
 }
 
+const updateNumbers = async (numbers, selectedNumber) => {
+
+    var params = {
+        TableName: "BingoRaffle",
+        Item: {
+            raffle: new Date().toLocaleDateString('pt-BR'),
+            date: new Date().toISOString(),
+            numbers: numbers.filter(i => i != selectedNumber),
+            selectedNumber: selectedNumber
+        },
+        ReturnValues: "ALL_OLD",
+        ReturnItemCollectionMetrics: "SIZE"
+    };
+
+    await dynamodb.put(params).promise();
+}
 exports.getUserCard = getUserCard;
 exports.getBingoNumbers = getBingoNumbers;
+exports.updateNumbers = updateNumbers;
