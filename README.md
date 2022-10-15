@@ -31,4 +31,10 @@ Since the Build project is referenced on the templete we define the build steps 
 the code structured is not the best since I'm reusing an old testing code to apply the pipeline configuration steps.
 I'm using the same code to reference different steps on my state machine. I won't split each function in one repository, the idea behind it is the same, if you can do one function you can do N, the steps are the same
 
+issues with `SAM init` try setting the full path location of yor template
+
+```bash
+sam init --location "C:\Users\{user}\AppData\Roaming\AWS SAM\aws-sam-cli-app-templates\nodejs14.x\cookiecutter-aws-sam-hello-powertools-typescript-nodejs"
+```
+
 adding more details later...

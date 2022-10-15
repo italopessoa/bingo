@@ -1,13 +1,13 @@
 {
     "Comment": "Bau da felicidade",
-    "StartAt": "Vender as cartelas",
+    "StartAt": "Postar anuncio do bingo",
     "States": {
       "Vender as cartelas": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
           "Payload.$": "$",
-          "FunctionName": "${BingoMainFunctionArn}"
+          "FunctionName": "${PostBingoBannerFunctionArn}"
         },
         "Retry": [
           {
