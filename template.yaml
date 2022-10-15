@@ -123,3 +123,14 @@ Resources:
       Permissions:
         - Write
         - Read
+
+  TSFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: built
+      Handler: ts-function/index.lambdaHandler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 120
+      MemorySize: 128
+     

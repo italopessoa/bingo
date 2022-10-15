@@ -30,6 +30,7 @@ phases:
   pre_build:
     commands:
       - npm install
+      - npm run tsc
       # - command
   build:
     on-failure: ABORT
