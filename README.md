@@ -37,4 +37,5 @@ issues with `SAM init` try setting the full path location of yor template
 sam init --location "C:\Users\{user}\AppData\Roaming\AWS SAM\aws-sam-cli-app-templates\nodejs14.x\cookiecutter-aws-sam-hello-powertools-typescript-nodejs"
 ```
 
+careful when choosing step names, as I can see if you change it you'll get errors when trying to update the stack as the step won't be reachable
 adding more details later...

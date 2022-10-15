@@ -37,7 +37,7 @@
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
           "Payload.$":"$",
-          "FunctionName":"${BingoMainFunctionArn}"
+          "FunctionName":"${FindPlayersFunctionArn}"
         },
         "Retry": [
           {

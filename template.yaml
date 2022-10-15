@@ -34,28 +34,15 @@ Resources:
       DefinitionUri: statemachine/bingo.json
       DefinitionSubstitutions:
         BingoMainFunctionArn: !GetAtt BingoMainFunction.Arn
-        PostBingoBannerFunctionArn: !GetAtt PostBingoBanner.Arn
+        PostBingoBannerFunctionArn: !GetAtt PostBingoBannerFunction.Arn
+        FindPlayersFunctionArn: !GetAtt FindPlayersFunction.Arn
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
             FunctionName: !Ref BingoMainFunction
         - LambdaInvokePolicy:
-            FunctionName: !Ref PostBingoBanner
-
-  PostBingoBanner:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: .
-      Handler: src/functions/BingoBanner/app.handler
-      Runtime: nodejs14.x
-      PackageType: Zip
-      Timeout: 120
-      MemorySize: 128
-      Environment:
-        Variables:
-          CONSUMER_KEY: !Ref TwitterConsumerKey
-          CONSUMER_SECRET: !Ref TwitterConsumerSecret
-          SECRET: !Ref TwitterAppSecret
-          TOKEN: !Ref TwitterAppToken
+            FunctionName: !Ref PostBingoBannerFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref FindPlayersFunction
 
   BingoMainFunction:
     Type: AWS::Serverless::Function
@@ -74,8 +61,38 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-    Metadata:
-      SamResourceId: bingoLambda
+
+  PostBingoBannerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/BingoBanner/app.handler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 120
+      MemorySize: 128
+      Environment:
+        Variables:
+          CONSUMER_KEY: !Ref TwitterConsumerKey
+          CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          SECRET: !Ref TwitterAppSecret
+          TOKEN: !Ref TwitterAppToken
+
+  FindPlayersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/FindPlayers/app.handler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 120
+      MemorySize: 128
+      Environment:
+        Variables:
+          CONSUMER_KEY: !Ref TwitterConsumerKey
+          CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          SECRET: !Ref TwitterAppSecret
+          TOKEN: !Ref TwitterAppToken
 
 
 
