@@ -36,13 +36,19 @@ Resources:
         BingoMainFunctionArn: !GetAtt BingoMainFunction.Arn
         PostBingoBannerFunctionArn: !GetAtt PostBingoBannerFunction.Arn
         FindPlayersFunctionArn: !GetAtt FindPlayersFunction.Arn
+        CreateTicketFunctionArn: !GetAtt CreateTicketFunction.Arn
+        NumbersDrawFunctionArn: !GetAtt NumbersDrawFunction.Arn
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
             FunctionName: !Ref BingoMainFunction
         - LambdaInvokePolicy:
             FunctionName: !Ref PostBingoBannerFunction
         - LambdaInvokePolicy:
-            FunctionName: !Ref FindPlayersFunction
+            FunctionName: !Ref FindPlayersFunction.Arn
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CreateTicketFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref NumbersDrawFunction
 
   BingoMainFunction:
     Type: AWS::Serverless::Function
@@ -94,7 +100,37 @@ Resources:
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
 
+  CreateTicketFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/CreateTicket/app.handler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 120
+      MemorySize: 128
+      Environment:
+        Variables:
+          CONSUMER_KEY: !Ref TwitterConsumerKey
+          CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          SECRET: !Ref TwitterAppSecret
+          TOKEN: !Ref TwitterAppToken
 
+  NumbersDrawFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/NumbersDraw/app.handler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 120
+      MemorySize: 128
+      Environment:
+        Variables:
+          CONSUMER_KEY: !Ref TwitterConsumerKey
+          CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          SECRET: !Ref TwitterAppSecret
+          TOKEN: !Ref TwitterAppToken
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
@@ -158,6 +194,28 @@ Resources:
         Id: BingoMainFunction
       Destination:
         Id: BingoTicketTable
+      Permissions:
+        - Write
+        - Read
+
+  CreateTicketTableConnection:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: CreateTicketFunction
+      Destination:
+        Id: BingoTicketTable
+      Permissions:
+        - Write
+        - Read
+
+  NumbersDrawTableConnection:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: NumbersDrawFunction
+      Destination:
+        Id: BingoRaffleTable
       Permissions:
         - Write
         - Read

@@ -11,14 +11,17 @@ const publishBingoPosterHandler = async (state) => {
     }, 'application/x-www-form-urlencoded');
 
     return {
-        publishedMessages: [
-            response.id_str
-        ],
-        bingo_advertise_tweet_id: response.id_str,
-        ads_tweet: response.id_str,
-        id: response.id,
-        start_time: bingoStartTimeEpoch,
-        start_time_z: bingoStartTime.toISOString()
+        body: {
+            publishedMessages: [
+                response.id_str
+            ],
+            bingo_advertise_tweet_id: response.id_str,
+            ads_tweet: response.id_str,
+            id: response.id,
+            start_time: bingoStartTimeEpoch,
+            start_time_z: bingoStartTime.toISOString()
+        },
+        statusCode: 200
     }
 }
 

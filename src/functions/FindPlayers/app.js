@@ -11,7 +11,7 @@ const getRetweets = (id) => OauthService.oauthGet(`https://api.twitter.com/1.1/s
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.handler = async (state) => {
+exports.handler = async ({ state }) => {
     const { ads_tweet, currentUsers } = state;
 
     var users = currentUsers ?? [];
