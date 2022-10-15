@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Create simple lambda function.
+Description: Create bingo state machine and functions for each step
 
 Parameters:
     TwitterConsumerKey: 
@@ -44,7 +44,7 @@ Resources:
         - LambdaInvokePolicy:
             FunctionName: !Ref PostBingoBannerFunction
         - LambdaInvokePolicy:
-            FunctionName: !Ref FindPlayersFunction.Arn
+            FunctionName: !Ref FindPlayersFunction
         - LambdaInvokePolicy:
             FunctionName: !Ref CreateTicketFunction
         - LambdaInvokePolicy:
