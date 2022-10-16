@@ -1,29 +1,8 @@
-var AWS = require("aws-sdk");
-var dynamodb = new AWS.DynamoDB.DocumentClient();
-
-const OauthService = require('../Services/OAuthHelperService');
+const TwitterService = require('../Services/TwitterHelperService');
+const DynamoDBService = require('../Services/DynamoDBHelperService');
 
 const searchWinners = () =>
-    OauthService.oauthGet(`https://api.twitter.com/1.1/search/tweets.json?q=%23bingobati&result_type=recent`);
-
-const getUserCard = async (user_id, message_id_str) => {
-    var params = {
-        ExpressionAttributeValues: {
-            ":userId": user_id
-        },
-        FilterExpression: "userId = :userId",
-        TableName: "BingoTicket"
-    };
-
-    var result = await dynamodb.scan(params).promise();
-
-    let userTicket = null;
-    if (result.Count > 0) {
-        var userCard = result.Items[0].card.split('-').map(n => parseInt(n));
-        userTicket = { userName: result.Items[0].userName, userCard, message_id_str };
-    }
-    return userTicket;
-}
+    TwitterService.oauthGet(`https://api.twitter.com/1.1/search/tweets.json?q=%23bingobati&result_type=recent`);
 
 const validateWinners = (calledNumbers, userCards) => {
     var winners = userCards
@@ -53,7 +32,7 @@ exports.handler = async ({ state }) => {
 
     console.log("buscar cartelas");
 
-    var allUserCard = await Promise.all(allUsers.map(({ user_id, id_str }) => getUserCard(user_id, id_str)));
+    var allUserCard = await Promise.all(allUsers.map(({ user_id, id_str }) => DynamoDBService.getUserCard(user_id, id_str)));
     var winnersList = validateWinners(state.calledNumbers, allUserCard);
 
     return {

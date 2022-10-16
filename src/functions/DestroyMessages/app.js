@@ -1,9 +1,9 @@
-const OauthService = require('../Services/OAuthHelperService');
+const TwitterService = require('../Services/TwitterHelperService');
 
 exports.handler = async ({ state }) => {
     console.log("DESTROY MESSAGE");
     for (let message of (state.publishedMessages ?? [])) {
-        await OauthService.oauthPost(`https://api.twitter.com/1.1/statuses/destroy/${message}.json`);
+        await TwitterService.destroyMessage(message);
         console.log("MESSAGE DESTROYED ", message);
     }
     return state;

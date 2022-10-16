@@ -1,4 +1,4 @@
-const { oauthPost } = require('../../Services/OAuthHelperService');
+const { oauthPost } = require('../../Services/TwitterHelperService');
 
 const destroyMessagesHandler = async (state) => {
     console.log("DESTROY MESSAGE");

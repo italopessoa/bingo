@@ -1,9 +1,9 @@
-const OauthService = require('../Services/OAuthHelperService');
+const TwitterService = require('../Services/TwitterHelperService');
 const DynamoDBService = require('../Services/DynamoDBHelperService');
 
 const { board, images } = require('../assets');
 
-const createMedia = (text) => OauthService.oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
+const createMedia = (text) => TwitterService.oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
     media_data: images[text],
     media_category: "tweet_image"
 }, 'multipart/form-data');
@@ -20,10 +20,10 @@ const pickRandomNumber = (numbers) => {
 const postSelectedNumber = async (group, number) => {
     //var numberMedia = await createMedia(number);
     //var groupMedia = await createMedia(group);
-    return await OauthService.oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
+    return await TwitterService.postStatusUpdate({
         status: `Na letra ${group}: ${number}`//,
         //media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
-    }, 'application/x-www-form-urlencoded');
+    });
 }
 
 exports.handler = async ({ state }) => {

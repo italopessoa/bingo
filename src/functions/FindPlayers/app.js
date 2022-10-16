@@ -1,4 +1,4 @@
-const OauthService = require('../Services/OAuthHelperService');
+const TwitterService = require('../Services/TwitterHelperService');
 
 /**
  *
@@ -13,7 +13,7 @@ exports.handler = async ({ state }) => {
     const { ads_tweet, currentUsers } = state;
 
     var users = currentUsers ?? [];
-    const newUsers = (await OauthService.getRetweetsFor(ads_tweet))
+    const newUsers = (await TwitterService.getRetweetsFor(ads_tweet))
         .ids
         .filter(item => users.indexOf(item) < 0);
 

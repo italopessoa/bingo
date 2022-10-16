@@ -1,6 +1,6 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
-const OauthService = require('../../Services/OAuthHelperService');
+const OauthService = require('../../Services/TwitterHelperService');
 const { board, images } = require('../../assets');
 
 const createMedia = (text) => OauthService.oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
@@ -41,10 +41,10 @@ const pickRandomNumber = (numbers) => {
 const postSelectedNumber = async (group, number) => {
     //var numberMedia = await createMedia(number);
     //var groupMedia = await createMedia(group);
-    return await OauthService.oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
+    return await OauthService.postStatusUpdate({
         status: `Na letra ${group}: ${number}`//,
         //media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
-    }, 'application/x-www-form-urlencoded');
+    });
 }
 
 const updateNumbers = async (numbers, selectedNumber) => {

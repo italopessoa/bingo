@@ -1,4 +1,4 @@
-const OauthService = require('../../Services/OAuthHelperService');
+const OauthService = require('../../Services/TwitterHelperService');
 
 const getRetweets = (id) => OauthService.oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
 

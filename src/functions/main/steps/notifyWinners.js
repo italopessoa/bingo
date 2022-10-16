@@ -1,4 +1,4 @@
-const OauthService = require('../../Services/OAuthHelperService');
+const OauthService = require('../../Services/TwitterHelperService');
 
 const notifyWinnersHandler = async (state) => {
     let messages = []
@@ -8,7 +8,7 @@ const notifyWinnersHandler = async (state) => {
             in_reply_to_status_id: item.message_id_str
         };
         console.log(body);
-        var response = await OauthService.oauthPost('https://api.twitter.com/1.1/statuses/update.json', body, 'application/x-www-form-urlencoded');
+        var response = await OauthService.postStatusUpdate(body);
         messages.push(response.id_str);
     }
 

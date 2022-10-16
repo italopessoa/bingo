@@ -1,4 +1,4 @@
-const OauthService = require('../Services/OAuthHelperService');
+const TwitterService = require('../Services/TwitterHelperService');
 
 exports.handler = async ({ state }) => {
     let messages = []
@@ -8,7 +8,7 @@ exports.handler = async ({ state }) => {
             in_reply_to_status_id: item.message_id_str
         };
         console.log(body);
-        var response = await OauthService.oauthPost('https://api.twitter.com/1.1/statuses/update.json', body, 'application/x-www-form-urlencoded');
+        var response = await TwitterService.postStatusUpdate(body);
         messages.push(response.id_str);
     }
 

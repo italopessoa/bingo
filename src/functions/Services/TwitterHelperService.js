@@ -13,7 +13,7 @@ const getOAuth = () => new OAuth.OAuth(
     '1.0A', null, 'HMAC-SHA1'
 );
 
-const oauthPost = (url, body=null, contentType="application/json") => new Promise((resolve, reject) => {
+const oauthPost = (url, body = null, contentType = "application/json") => new Promise((resolve, reject) => {
     getOAuth().post(url,
         oauth_token,
         oauth_token_secret,
@@ -66,7 +66,15 @@ const validatePlayer = async (userId) => {
 
 const getRetweetsFor = (id) => oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
 
+const postStatusUpdate = (message) => oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
+    ...message
+}, 'application/x-www-form-urlencoded');
+
+const destroyMessage = (message) => oauthPost(`https://api.twitter.com/1.1/statuses/destroy/${message}.json`);
+
 exports.oauthGet = oauthGet;
 exports.oauthPost = oauthPost;
 exports.validatePlayer = validatePlayer;
 exports.getRetweetsFor = getRetweetsFor;
+exports.postStatusUpdate = postStatusUpdate;
+exports.destroyMessage = destroyMessage;
