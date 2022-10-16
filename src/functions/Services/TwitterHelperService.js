@@ -1,5 +1,4 @@
 const OAuth = require('oauth');
-const { json } = require('stream/consumers');
 
 let oauth_consumer_key = process.env.CONSUMER_KEY;
 let oauth_consumer_secret = process.env.CONSUMER_SECRET;
