@@ -3,11 +3,6 @@ const DynamoDBService = require('../Services/DynamoDBHelperService');
 
 const { board, images } = require('../assets');
 
-const createMedia = (text) => TwitterService.oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
-    media_data: images[text],
-    media_category: "tweet_image"
-}, 'multipart/form-data');
-
 const getNumberGroup = (number) => {
     console.log(`trying to get group for number ${number}`);
     return board.filter(numberGroup => number >= numberGroup.min && number <= numberGroup.max)[0].key;
@@ -18,8 +13,8 @@ const pickRandomNumber = (numbers) => {
 }
 
 const postSelectedNumber = async (group, number) => {
-    //var numberMedia = await createMedia(number);
-    //var groupMedia = await createMedia(group);
+    // var numberMedia = await TwitterService.creteMedia(images[number]);
+    // var groupMedia = await TwitterService.creteMedia(images[group]);
     return await TwitterService.postStatusUpdate({
         status: `Na letra ${group}: ${number}`//,
         //media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
@@ -37,7 +32,7 @@ exports.handler = async (state) => {
 
     return {
         ...state,
-        lastCallDate: new Date(numberCall.created_at).toISOString(),
+        lastBallCalledDate: new Date(numberCall.created_at).toISOString(),
         count: 1 + (state.count ?? 0),
         calledNumbers,
         publishedMessages: [...state.publishedMessages, numberCall.id_str]

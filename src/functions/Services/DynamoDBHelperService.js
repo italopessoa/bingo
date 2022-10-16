@@ -1,7 +1,7 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const getUserCard = async (user_id, message_id_str) => {
+const getUserCard = async (user_id, winnerNotificationReferenceMessageId) => {
     var params = {
         ExpressionAttributeValues: {
             ":userId": user_id
@@ -15,7 +15,7 @@ const getUserCard = async (user_id, message_id_str) => {
     let userTicket = null;
     if (result.Count > 0) {
         var userCard = result.Items[0].card.split('-').map(n => parseInt(n));
-        userTicket = { userName: result.Items[0].userName, userCard, message_id_str };
+        userTicket = { userName: result.Items[0].userName, userCard, winnerNotificationReferenceMessageId };
     }
     return userTicket;
 }

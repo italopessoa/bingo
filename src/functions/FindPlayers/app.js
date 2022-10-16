@@ -10,16 +10,16 @@ const TwitterService = require('../Services/TwitterHelperService');
  * 
  */
 exports.handler = async (state) => {
-    const { ads_tweet, currentUsers } = state;
+    const { bingoSubscriptionMessageId, currentPlayers } = state;
 
-    var users = currentUsers ?? [];
-    const newUsers = (await TwitterService.getRetweetsFor(ads_tweet))
+    var players = currentPlayers ?? [];
+    const newPlayers = (await TwitterService.getRetweetsFor(bingoSubscriptionMessageId))
         .ids
-        .filter(item => users.indexOf(item) < 0);
+        .filter(item => players.indexOf(item) < 0);
 
     return {
         ...state,
-        currentUsers: users.concat(newUsers),
-        newUsers
+        currentPlayers: players.concat(newPlayers),
+        newPlayers
     }
 };

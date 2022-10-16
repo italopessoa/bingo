@@ -1,4 +1,5 @@
 const OAuth = require('oauth');
+const { json } = require('stream/consumers');
 
 let oauth_consumer_key = process.env.CONSUMER_KEY;
 let oauth_consumer_secret = process.env.CONSUMER_SECRET;
@@ -64,13 +65,33 @@ const validatePlayer = async (userId) => {
 }
 
 
-const getRetweetsFor = (id) => oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
+const getRetweetsFor = async (id) => {
+    console.log("Trying to get retweets for Bingo advertisement message.");
+    const result = oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
+    console.log(`${result.ids.length} messages found`);
 
+    return result;
+}
 const postStatusUpdate = (message) => oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
     ...message
 }, 'application/x-www-form-urlencoded');
 
 const destroyMessage = (message) => oauthPost(`https://api.twitter.com/1.1/statuses/destroy/${message}.json`);
+
+
+const createImageMedia = (imageBase64Text) => oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
+    media_data: imageBase64Text,
+    media_category: "tweet_image"
+}, 'multipart/form-data');
+
+
+const searchWinners = () => {
+    console.log("Trying to get players who claim victory on Twitter.");
+    const result = TwitterService.oauthGet(`https://api.twitter.com/1.1/search/tweets.json?q=%23bingobati&result_type=recent`);
+    console.log("These users were found: ", JSON.stringify(result.statuses));
+
+    return result;
+}
 
 exports.oauthGet = oauthGet;
 exports.oauthPost = oauthPost;
@@ -78,3 +99,5 @@ exports.validatePlayer = validatePlayer;
 exports.getRetweetsFor = getRetweetsFor;
 exports.postStatusUpdate = postStatusUpdate;
 exports.destroyMessage = destroyMessage;
+exports.creteMedia = createMedia;
+exports.searchWinners = searchWinners;

@@ -85,7 +85,7 @@
           }
         ],
         "TimeoutSeconds": 15,
-        "Next": "Wait for more players before start time",
+        "Next": "Is is time to draw the numbers?",
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
@@ -97,8 +97,8 @@
           {
             "And": [
               {
-                "Variable": "$.state.current_time_z",
-                "TimestampGreaterThanPath": "$.state.start_time_z"
+                "Variable": "$.currentTimeISO",
+                "TimestampGreaterThanPath": "$.bingoStartTimeISO"
               }
             ],
             "Next": "Pass"
@@ -141,7 +141,7 @@
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.state.count",
+            "Variable": "$.count",
             "NumericEquals": 24,
             "Next": "Pass (2)"
           }
@@ -194,7 +194,7 @@
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.state.hasWinner",
+            "Variable": "$.hasWinner",
             "BooleanEquals": true,
             "Next": "Pass (4)"
           }

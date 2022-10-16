@@ -13,8 +13,6 @@ const add_minutes = (dt, minutes) => new Date(dt.getTime() + minutes * 60000);
  */
 exports.handler = async (input) => {
     const { StartTime, ExecutionName: executionName } = input;
-    var bingoStartTime = add_minutes(new Date(StartTime), 0);
-    var bingoStartTimeEpoch = Math.round(bingoStartTime.getTime() / 1000);
 
     var response = await TwitterService.postStatusUpdate({
         status: `Play at: ${StartTime} - Start at:${add_minutes(new Date(StartTime), 10)}`
@@ -25,8 +23,7 @@ exports.handler = async (input) => {
         publishedMessages: [
             response.id_str
         ],
-        ads_tweet: response.id_str,
-        start_time: bingoStartTimeEpoch,
-        start_time_z: bingoStartTime.toISOString()
+        bingoSubscriptionMessageId: response.id_str,
+        bingoStartTimeISO: add_minutes(new Date(StartTime), 0).toISOString()
     }
 }

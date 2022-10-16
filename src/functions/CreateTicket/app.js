@@ -52,7 +52,7 @@ const fillByOrder = (n, size, min, max) => {
     return cardColumn;
 }
 
-const generateCard = async (userId, username) => {
+const generateCard = async (playerId, username) => {
 
     let userCard = generateCardNumbers();
     let cardCreated = false;
@@ -66,11 +66,11 @@ const generateCard = async (userId, username) => {
                 TableName: "BingoTicket",
                 Item: {
                     TicketHash: hashBase64,
-                    userId: "" + userId + "",
+                    playerId: "" + playerId + "",
                     card: userCard.join('-'),
                     userName: username
                 },
-                ConditionExpression: 'attribute_not_exists(TicketHash) AND attribute_not_exists(userId)',
+                ConditionExpression: 'attribute_not_exists(TicketHash) AND attribute_not_exists(playerId)',
                 ReturnValues: "ALL_OLD",
                 ReturnItemCollectionMetrics: "SIZE"
             };
@@ -117,27 +117,27 @@ const sendMessage = (recipient_id, message) => oauthPost(`https://api.twitter.co
     'application/json');
 
 exports.handler = async (state) => {
-    const { currentUsers, newUsers, invalidUsers } = state;
-    let tmpInvalidUsers = invalidUsers ?? [];
-    for (var prop in newUsers.filter(x => tmpInvalidUsers.indexOf(x) < 0)) {
-        const userId = newUsers[prop]
+    const { currentPlayers, newPlayers, invalidPlayers } = state;
+    let tmpInvalidPlayers = invalidPlayers ?? [];
+    for (var prop in newPlayers.filter(x => tmpInvalidPlayers.indexOf(x) < 0)) {
+        const playerId = newPlayers[prop]
         try {
-            var username = await validatePlayer(userId);
+            var username = await validatePlayer(playerId);
             if (username) {
-                var card = await generateCard(userId, username);
-                await sendMessage(userId, "sua cartela = " + card.join('-'));
+                var card = await generateCard(playerId, username);
+                await sendMessage(playerId, "sua cartela = " + card.join('-'));
             } else {
-                tmpInvalidUsers.push(userId);
+                tmpInvalidPlayers.push(playerId);
             }
         }
         catch (e) {
-            tmpInvalidUsers.push(userId);
+            tmpInvalidPlayers.push(playerId);
         }
     };
     return {
         ...state,
-        currentUsers: currentUsers.filter(x => tmpInvalidUsers.indexOf(x) < 0),
-        invalidUsers: tmpInvalidUsers,
-        current_time_z: new Date().toISOString(),
+        currentPlayers: currentPlayers.filter(x => tmpInvalidPlayers.indexOf(x) < 0),
+        invalidPlayers: tmpInvalidPlayers,
+        currentTimeISO: new Date().toISOString(),
     }
 }
