@@ -98,5 +98,5 @@ exports.validatePlayer = validatePlayer;
 exports.getRetweetsFor = getRetweetsFor;
 exports.postStatusUpdate = postStatusUpdate;
 exports.destroyMessage = destroyMessage;
-exports.creteMedia = createMedia;
+exports.createImageMedia = createImageMedia;
 exports.searchWinners = searchWinners;
