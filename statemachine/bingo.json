@@ -91,7 +91,7 @@
           "state.$": "$.Payload"
         }
       },
-      "Wait for more players before start time": {
+      "Is is time to draw the numbers?": {
         "Type": "Choice",
         "Choices": [
           {
