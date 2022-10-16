@@ -11,7 +11,7 @@ const validateWinners = (calledNumbers, userCards) => {
     return winners;
 }
 
-exports.handler = async ({ state }) => {
+exports.handler = async (state) => {
     const { currentUsers, lastBallCallDate } = state;
     var users = currentUsers ?? [];
     let winners = await searchWinners();

@@ -1,6 +1,6 @@
 const TwitterService = require('../Services/TwitterHelperService');
 
-exports.handler = async ({ state }) => {
+exports.handler = async (state) => {
     let messages = []
     for (let item of (state.winnersList ?? [])) {
         var body = {

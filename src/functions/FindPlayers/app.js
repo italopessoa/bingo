@@ -3,13 +3,13 @@ const TwitterService = require('../Services/TwitterHelperService');
 /**
  *
  * State doc: 
- * @param {Object} state - 
+ * @param {Object} state - state object
  *
  * Return doc: 
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
+ * @returns {Object} state - updated state object
  * 
  */
-exports.handler = async ({ state }) => {
+exports.handler = async (state) => {
     const { ads_tweet, currentUsers } = state;
 
     var users = currentUsers ?? [];

@@ -116,7 +116,7 @@ const sendMessage = (recipient_id, message) => oauthPost(`https://api.twitter.co
     }),
     'application/json');
 
-exports.handler = async ({ state }) => {
+exports.handler = async (state) => {
     const { currentUsers, newUsers, invalidUsers } = state;
     let tmpInvalidUsers = invalidUsers ?? [];
     for (var prop in newUsers.filter(x => tmpInvalidUsers.indexOf(x) < 0)) {

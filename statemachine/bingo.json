@@ -6,7 +6,11 @@
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
-          "Payload.$": "$",
+          "Payload": {
+            "ExecutionName.$": "$$.Execution.Name",
+            "StartTime.$": "$$.Execution.StartTime",
+            "Comment.$": "$$.Execution.Input.Comment"
+          },
           "FunctionName": "${PostBingoBannerFunctionArn}"
         },
         "Retry": [
@@ -22,9 +26,9 @@
           }
         ],
         "Next": "Wait for players subscription",
+        "OutputPath": "$.state",
         "ResultSelector": {
-          "state.$": "$.Payload",
-          "nextStep": "findUsers"
+          "state.$": "$.Payload"
         }
       },
       "Wait for players subscription": {
@@ -52,9 +56,9 @@
           }
         ],
         "Next": "Pass (1)",
+        "OutputPath": "$.state",
         "ResultSelector": {
-          "state.$": "$.Payload",
-          "nextStep": "createCards"
+          "state.$": "$.Payload"
         }
       },
       "Pass (1)": {
@@ -82,9 +86,9 @@
         ],
         "TimeoutSeconds": 15,
         "Next": "Wait for more players before start time",
+        "OutputPath": "$.state",
         "ResultSelector": {
-          "state.$": "$.Payload",
-          "nextStep": "findUsers"
+          "state.$": "$.Payload"
         }
       },
       "Wait for more players before start time": {
@@ -128,9 +132,9 @@
           }
         ],
         "Next": "Any number available?",
+        "OutputPath": "$.state",
         "ResultSelector": {
-          "state.$": "$.Payload",
-          "nextStep": "checkWinner"
+          "state.$": "$.Payload"
         }
       },
       "Any number available?": {
@@ -181,9 +185,9 @@
           }
         ],
         "Next": "Any winner?",
+        "OutputPath": "$.state",
         "ResultSelector": {
-          "state.$": "$.Payload",
-          "nextStep": "callBall"
+          "state.$": "$.Payload"
         }
       },
       "Any winner?": {
@@ -222,9 +226,9 @@
             "BackoffRate": 2
           }
         ],
+        "OutputPath": "$.state",
         "ResultSelector": {
-          "state.$": "$.Payload",
-          "nextStep": "finish"
+          "state.$": "$.Payload"
         },
         "Next": "Destroy messages"
       },

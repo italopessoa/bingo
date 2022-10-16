@@ -26,7 +26,7 @@ const postSelectedNumber = async (group, number) => {
     });
 }
 
-exports.handler = async ({ state }) => {
+exports.handler = async (state) => {
     let calledNumbers = state.calledNumbers ?? [];
     let numbers = await DynamoDBService.getBingoNumbers();
     let selectedNumber = pickRandomNumber(numbers);
