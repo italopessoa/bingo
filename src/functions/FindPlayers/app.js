@@ -1,4 +1,4 @@
-const TwitterService = require('../Services/TwitterHelperService');
+import { getRetweetsFor } from '../Services/TwitterHelperService';
 
 /**
  *
@@ -9,11 +9,11 @@ const TwitterService = require('../Services/TwitterHelperService');
  * @returns {Object} state - updated state object
  * 
  */
-exports.handler = async (state) => {
+export async function handler(state) {
     const { bingoSubscriptionMessageId, currentPlayers } = state;
 
     var players = currentPlayers ?? [];
-    const newPlayers = (await TwitterService.getRetweetsFor(bingoSubscriptionMessageId))
+    const newPlayers = (await getRetweetsFor(bingoSubscriptionMessageId))
         .ids
         .filter(item => players.indexOf(item) < 0);
 
@@ -22,4 +22,4 @@ exports.handler = async (state) => {
         currentPlayers: players.concat(newPlayers),
         newPlayers
     }
-};
+}

@@ -1,9 +1,7 @@
-const crypto = require('crypto');
-var AWS = require("aws-sdk");
-var dynamodb = new AWS.DynamoDB.DocumentClient();
-const { oauthPost, validatePlayer } = require('../Services/TwitterHelperService');
-const { board } = require('../assets')
-;
+import { createHash } from 'crypto';
+import { tryToSaveBingoTicket } from '../Services/DynamoDBHelperService';
+import { validatePlayer, sendDirectMessageWithTicket } from '../Services/TwitterHelperService';
+import { board } from '../assets';
 
 let numbers = [...Array(75)].map((item, currentIndex) => {
     return { [currentIndex + 1]: false }
@@ -52,80 +50,33 @@ const fillByOrder = (n, size, min, max) => {
     return cardColumn;
 }
 
-const generateCard = async (playerId, username) => {
+const generateCard = async (playerId, username, bingoExecutionName) => {
 
     let userCard = generateCardNumbers();
     let cardCreated = false;
     do {
-        try {
-            var cardCopy = [...userCard];
-            const hash = crypto.createHash('sha256');
-            hash.update(cardCopy.sort((a, b) => a - b).join('-'));
-            var hashBase64 = hash.digest('base64');
-            var params = {
-                TableName: "BingoTicket",
-                Item: {
-                    TicketHash: hashBase64,
-                    playerId: "" + playerId + "",
-                    card: userCard.join('-'),
-                    userName: username
-                },
-                ConditionExpression: 'attribute_not_exists(TicketHash) AND attribute_not_exists(playerId)',
-                ReturnValues: "ALL_OLD",
-                ReturnItemCollectionMetrics: "SIZE"
-            };
 
-            await dynamodb.put(params).promise();
-            cardCreated = true;
-        } catch (e) {
-            if (e.code == 'ConditionalCheckFailedException') {
-                cardCreated = false;
-                userCard = generateCardNumbers();
-            }
-        }
+        var cardCopy = [...userCard];
+        const hash = createHash('sha256');
+        hash.update(cardCopy.sort((a, b) => a - b).join('-'));
+        var hashBase64 = hash.digest('base64');
+        cardCreated = await tryToSaveBingoTicket(hashBase64, playerId, cardCopy, username, bingoExecutionName);
     }
     while (!cardCreated);
     return userCard;
 }
 
-const sendMessage = (recipient_id, message) => oauthPost(`https://api.twitter.com/1.1/direct_messages/events/new.json`,
-    JSON.stringify({
-        event: {
-            type: "message_create",
-            message_create: {
-                target: {
-                    recipient_id: `${recipient_id}`
-                },
-                message_data: {
-                    text: message,
-                    ctas: [
-                        {
-                            "type": "web_url",
-                            "label": "So noticia top",
-                            "url": "http://www.diariodequixada.com.br/"
-                        },
-                        {
-                            "type": "web_url",
-                            "label": "Site de putaria",
-                            "url": "https://www.youtube.com/watch?v=8R-SVel6NVAt"
-                        }
-                    ]
-                },
-            }
-        }
-    }),
-    'application/json');
-
-exports.handler = async (state) => {
-    const { currentPlayers, newPlayers, invalidPlayers } = state;
+export async function handler(state) {
+    const { currentPlayers, newPlayers, invalidPlayers, executionName } = state;
     let tmpInvalidPlayers = invalidPlayers ?? [];
-    for (var prop in newPlayers.filter(x => tmpInvalidPlayers.indexOf(x) < 0)) {
-        const playerId = newPlayers[prop]
+ 
+    for (var player in newPlayers.filter(x => tmpInvalidPlayers.indexOf(x) < 0)) {
+        const playerId = newPlayers[player]
         try {
             var username = await validatePlayer(playerId);
             if (username) {
-                var card = await generateCard(playerId, username);
-                await sendMessage(playerId, "sua cartela = " + card.join('-'));
+                var card = await generateCard(playerId, username, executionName);
+                await sendDirectMessageWithTicket(playerId, "sua cartela = " + card.join('-'));
             } else {
                 tmpInvalidPlayers.push(playerId);
             }
@@ -134,10 +85,11 @@ exports.handler = async (state) => {
             tmpInvalidPlayers.push(playerId);
         }
     };
+
     return {
         ...state,
         currentPlayers: currentPlayers.filter(x => tmpInvalidPlayers.indexOf(x) < 0),
         invalidPlayers: tmpInvalidPlayers,
-        currentTimeISO: new Date().toISOString(),
+        currentTimeISO: new Date().toISOString()
     }
 }

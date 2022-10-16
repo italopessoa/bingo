@@ -1,8 +1,8 @@
-const TwitterService = require('../Services/TwitterHelperService');
+import { destroyMessage } from '../Services/TwitterHelperService';
 
-exports.handler = async (state) => {
+export async function handler(state) {
     for (let message of (state.publishedMessages ?? [])) {
-        await TwitterService.destroyMessage(message);
+        await destroyMessage(message);
     }
     return state;
 }

@@ -33,7 +33,7 @@
       },
       "Wait for players subscription": {
         "Type": "Wait",
-        "Seconds": 15,
+        "Seconds": 20,
         "Next": "Register players"
       },
       "Register players": {
@@ -55,15 +55,11 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Pass (1)",
+        "Next": "Create tickets",
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
         }
-      },
-      "Pass (1)": {
-        "Type": "Pass",
-        "Next": "Create tickets"
       },
       "Create tickets": {
         "Type": "Task",
@@ -101,18 +97,12 @@
                 "TimestampGreaterThanPath": "$.bingoStartTimeISO"
               }
             ],
-            "Next": "Pass"
+            "Next": "Draw a number"
           }
         ],
         "Default": "Wait for players subscription"
       },
-      "Pass": {
-        "Type": "Pass",
-        "Next": "Numbers draw",
-        "Result": "callBall",
-        "ResultPath": "$.nextStep"
-      },
-      "Numbers draw": {
+      "Draw a number": {
         "Type": "Task",
         "Resource": "arn:aws:states:::lambda:invoke",
         "Parameters": {
@@ -143,22 +133,10 @@
           {
             "Variable": "$.count",
             "NumericEquals": 24,
-            "Next": "Pass (2)"
+            "Next": "Destroy messages"
           }
         ],
-        "Default": "Pass (3)"
-      },
-      "Pass (2)": {
-        "Type": "Pass",
-        "Next": "Destroy messages",
-        "Result": "finish",
-        "ResultPath": "$.nextStep"
-      },
-      "Pass (3)": {
-        "Type": "Pass",
-        "Next": "Wait for player to check their tickets",
-        "ResultPath": "$.nextStep",
-        "Result": "checkWinner"
+        "Default": "Wait for player to check their tickets"
       },
       "Wait for player to check their tickets": {
         "Type": "Wait",
@@ -196,16 +174,10 @@
           {
             "Variable": "$.hasWinner",
             "BooleanEquals": true,
-            "Next": "Pass (4)"
+            "Next": "Notify winner"
           }
         ],
-        "Default": "Numbers draw"
-      },
-      "Pass (4)": {
-        "Type": "Pass",
-        "Next": "Notify winner",
-        "ResultPath": "$.nextStep",
-        "Result": "notifyWinners"
+        "Default": "Draw a number"
       },
       "Notify winner": {
         "Type": "Task",

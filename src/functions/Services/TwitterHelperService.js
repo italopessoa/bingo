@@ -63,10 +63,9 @@ const validatePlayer = async (userId) => {
     }
 }
 
-
 const getRetweetsFor = async (id) => {
     console.log("Trying to get retweets for Bingo advertisement message.");
-    const result = oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
+    const result = await oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
     console.log(`${result.ids.length} messages found`);
 
     return result;
@@ -84,13 +83,41 @@ const createImageMedia = (imageBase64Text) => oauthPost('https://upload.twitter.
 }, 'multipart/form-data');
 
 
-const searchWinners = () => {
+const searchWinners = async () => {
     console.log("Trying to get players who claim victory on Twitter.");
-    const result = TwitterService.oauthGet(`https://api.twitter.com/1.1/search/tweets.json?q=%23bingobati&result_type=recent`);
+    const result = await oauthGet(`https://api.twitter.com/1.1/search/tweets.json?q=%23bingobati&result_type=recent`);
     console.log("These users were found: ", JSON.stringify(result.statuses));
 
     return result;
 }
+
+const sendDirectMessageWithTicket = (recipient_id, message) => oauthPost(`https://api.twitter.com/1.1/direct_messages/events/new.json`,
+    JSON.stringify({
+        event: {
+            type: "message_create",
+            message_create: {
+                target: {
+                    recipient_id: `${recipient_id}`
+                },
+                message_data: {
+                    text: message,
+                    ctas: [
+                        {
+                            "type": "web_url",
+                            "label": "So noticia top",
+                            "url": "http://www.diariodequixada.com.br/"
+                        },
+                        {
+                            "type": "web_url",
+                            "label": "Site de putaria",
+                            "url": "https://www.youtube.com/watch?v=8R-SVel6NVAt"
+                        }
+                    ]
+                },
+            }
+        }
+    }),
+    'application/json');
 
 exports.oauthGet = oauthGet;
 exports.oauthPost = oauthPost;
@@ -100,3 +127,4 @@ exports.postStatusUpdate = postStatusUpdate;
 exports.destroyMessage = destroyMessage;
 exports.createImageMedia = createImageMedia;
 exports.searchWinners = searchWinners;
+exports.sendDirectMessageWithTicket = sendDirectMessageWithTicket;

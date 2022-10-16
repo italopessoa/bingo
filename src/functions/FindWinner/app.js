@@ -1,5 +1,5 @@
-const TwitterService = require('../Services/TwitterHelperService');
-const DynamoDBService = require('../Services/DynamoDBHelperService');
+import { searchWinners } from '../Services/TwitterHelperService';
+import { getUserCard } from '../Services/DynamoDBHelperService';
 
 const validateWinners = (calledNumbers, userCards) => {
     var winners = userCards
@@ -8,10 +8,10 @@ const validateWinners = (calledNumbers, userCards) => {
     return winners;
 }
 
-exports.handler = async (state) => {
+export async function handler(state) {
     const { currentPlayers, lastBallCalledDate } = state;
     var players = currentPlayers ?? [];
-    let winners = await TwitterService.searchWinners();
+    let winners = await searchWinners();
 
     let allPlayers = winners.statuses
         .map(({ id_str, user, created_at, text }, _) => ({
@@ -31,7 +31,7 @@ exports.handler = async (state) => {
         await Promise.all(
             allPlayers
                 .map(({ user_id, winnerNotificationReferenceMessageId }) => {
-                    return DynamoDBService.getUserCard(user_id, winnerNotificationReferenceMessageId);
+                    return getUserCard(user_id, winnerNotificationReferenceMessageId);
                 }));
 
     var winnersList = validateWinners(state.calledNumbers, allUserCard);
@@ -41,4 +41,4 @@ exports.handler = async (state) => {
         hasWinner: winnersList.length > 0,
         winnersList
     };
-};
+}
