@@ -1,4 +1,4 @@
-import { postStatusUpdate } from '../Services/TwitterHelperService';
+const TwitterService = require('../Services/TwitterHelperService');
 
 const add_minutes = (dt, minutes) => new Date(dt.getTime() + minutes * 60000);
 
@@ -11,10 +11,10 @@ const add_minutes = (dt, minutes) => new Date(dt.getTime() + minutes * 60000);
  * @returns {Object} state - Return initial state
  * 
  */
-export async function handler(input) {
+exports.handler = async (input) => {
     const { StartTime, ExecutionName: executionName } = input;
 
-    var response = await postStatusUpdate({
+    var response = await TwitterService.postStatusUpdate({
         status: `Play at: ${StartTime} - Start at:${add_minutes(new Date(StartTime), 10)}`
     });
 

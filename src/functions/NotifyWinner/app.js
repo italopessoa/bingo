@@ -1,6 +1,6 @@
-import { postStatusUpdate } from '../Services/TwitterHelperService';
+const TwitterService = require('../Services/TwitterHelperService');
 
-export async function handler(state) {
+exports.handler = async (state) => {
     let messages = []
     for (let player of (state.winnersList ?? [])) {
         var body = {
@@ -8,7 +8,7 @@ export async function handler(state) {
             in_reply_to_status_id: player.winnerNotificationReferenceMessageId
         };
 
-        var response = await postStatusUpdate(body);
+        var response = await TwitterService.postStatusUpdate(body);
         messages.push(response.id_str);
     }
 

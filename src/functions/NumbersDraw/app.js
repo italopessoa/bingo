@@ -1,7 +1,7 @@
-import { postStatusUpdate } from '../Services/TwitterHelperService';
-import { getBingoNumbers, updateNumbers } from '../Services/DynamoDBHelperService';
+const TwitterService = require('../Services/TwitterHelperService');
+const DynamoDBService = require('../Services/DynamoDBHelperService');
 
-import { board, images } from '../assets';
+const { board, images } = require('../assets');
 
 const getNumberGroup = (number) => {
     console.log(`trying to get group for number ${number}`);
@@ -15,19 +15,19 @@ const pickRandomNumber = (numbers) => {
 const postSelectedNumber = async (group, number) => {
     // var numberMedia = await TwitterService.createImageMedia(images[number]);
     // var groupMedia = await TwitterService.createImageMedia(images[group]);
-    return await postStatusUpdate({
+    return await TwitterService.postStatusUpdate({
         status: `Na letra ${group}: ${number}`//,
         //media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
     });
 }
 
-export async function handler(state) {
+exports.handler = async (state) => {
     let calledNumbers = state.calledNumbers ?? [];
-    let numbers = await getBingoNumbers();
+    let numbers = await DynamoDBService.getBingoNumbers();
     let selectedNumber = pickRandomNumber(numbers);
     let group = getNumberGroup(selectedNumber);
     var numberCall = await postSelectedNumber(group, selectedNumber);
-    await updateNumbers(numbers, selectedNumber);
+    await DynamoDBService.updateNumbers(numbers, selectedNumber);
     calledNumbers.push(selectedNumber);
 
     return {
