@@ -68,30 +68,17 @@ const generateCard = async (playerId, username, bingoExecutionName) => {
 
 
 exports.handler = async (state) => {
-    const { players, newPlayers, invalidPlayers, executionName } = state;
-    let playersNotFound = [];
+    const { newPlayers, executionName } = state;
 
-    for (let player in newPlayers.filter(x => invalidPlayers.indexOf(x) < 0)) {
+    for (let player in newPlayers) {
         const playerId = newPlayers[player]
-        try {
-            let { isValid, userName } = await TwitterService.validatePlayer(playerId);
-            if (isValid) {
-                let ticket = await generateCard(playerId, userName, executionName);
-                await TwitterService.sendDirectMessageWithTicket(playerId, "sua cartela = " + ticket.join('-'));
-            } else {
-                playersNotFound.push(playerId);
-            }
-        }
-        catch (e) {
-            console.log(`Error when trying to find user ${playerId}: `, JSON.stringify(e));
-            playersNotFound.push(playerId);
-        }
+        const userName = await TwitterService.getUserName(playerId);
+        let ticket = await generateCard(playerId, userName, executionName);
+        await TwitterService.sendDirectMessageWithTicket(playerId, "sua cartela = " + ticket.join('-'));
     };
 
     return {
         ...state,
-        players: players.filter(x => playersNotFound.indexOf(x) < 0),
-        invalidPlayers: invalidPlayers.concat(playersNotFound),
         currentTimeISO: new Date().toISOString()
     }
 }

@@ -73,6 +73,18 @@ const validatePlayer = async (userId) => {
 
 }
 
+const getUserName = async (userId) => {
+    try {
+        var response = await oauthGet(`https://api.twitter.com/2/users/${userId}`);
+        result.userName = response.data.username;
+
+        return response.data.username;
+    } catch (error) {
+        console.log(`Error when trying to get username for userId ${userId}: `, error);
+        return null;
+    }
+}
+
 const getPlayerSubscriptionRetweetsFor = async (id) => {
     console.log("Trying to get retweets for Bingo advertisement message.");
     const result = await oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
@@ -81,12 +93,12 @@ const getPlayerSubscriptionRetweetsFor = async (id) => {
     return result;
 }
 
-const checkUserIsFollowing = async (id) => {
+const getTargetUserRelationship = async (userTargetId) => {
     console.log("Checking relationship between accounts");
-    const result = await oauthGet(`https://api.twitter.com/1.1/friendships/show.json?source_screen_name=ItaloNeyPessoa&target_screen_name=awscloud`);
+    const result = await oauthGet(`https://api.twitter.com/1.1/friendships/show.json?source_screen_name=ItaloNeyPessoa&target_id=${userTargetId}`);
     console.log(result);
 
-    return result.relationship.target.following;
+    return result.relationship.target;
 }
 const postStatusUpdate = (message) => oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
     ...message
@@ -146,4 +158,5 @@ exports.destroyMessage = destroyMessage;
 exports.createImageMedia = createImageMedia;
 exports.searchWinners = searchWinners;
 exports.sendDirectMessageWithTicket = sendDirectMessageWithTicket;
-exports.checkUserIsFollowing = checkUserIsFollowing;
+exports.getTargetUserRelationship = getTargetUserRelationship;
+exports.getUserName = getUserName;
