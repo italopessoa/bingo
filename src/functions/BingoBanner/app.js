@@ -24,6 +24,8 @@ exports.handler = async (input) => {
             response.id_str
         ],
         bingoSubscriptionMessageId: response.id_str,
-        bingoStartTimeISO: add_minutes(new Date(StartTime), 0).toISOString()
+        bingoStartTimeISO: add_minutes(new Date(StartTime), 0).toISOString(),
+        players: [],
+        invalidPlayers: []
     }
 }

@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const TwitterService = require('../Services/TwitterHelperService');
+const DynamoDBService = require('../Services/DynamoDBHelperService');
 const { board, images } = require('../assets');
 
 let numbers = [...Array(75)].map((item, currentIndex) => {
@@ -65,30 +66,32 @@ const generateCard = async (playerId, username, bingoExecutionName) => {
     return userCard;
 }
 
-export async function handler(state) {
-    const { currentPlayers, newPlayers, invalidPlayers, executionName } = state;
-    let tmpInvalidPlayers = invalidPlayers ?? [];
 
-    for (var player in newPlayers.filter(x => tmpInvalidPlayers.indexOf(x) < 0)) {
+exports.handler = async (state) => {
+    const { players, newPlayers, invalidPlayers, executionName } = state;
+    let playersNotFound = [];
+
+    for (let player in newPlayers.filter(x => invalidPlayers.indexOf(x) < 0)) {
         const playerId = newPlayers[player]
         try {
-            var username = await TwitterService.validatePlayer(playerId);
-            if (username) {
-                var card = await generateCard(playerId, username, executionName);
-                await sendDirectMessageWithTicket(playerId, "sua cartela = " + card.join('-'));
+            let { isValid, userName } = await TwitterService.validatePlayer(playerId);
+            if (isValid) {
+                let ticket = await generateCard(playerId, userName, executionName);
+                await TwitterService.sendDirectMessageWithTicket(playerId, "sua cartela = " + ticket.join('-'));
             } else {
-                tmpInvalidPlayers.push(playerId);
+                playersNotFound.push(playerId);
             }
         }
         catch (e) {
-            tmpInvalidPlayers.push(playerId);
+            console.log(`Error when trying to find user ${playerId}: `, JSON.stringify(e));
+            playersNotFound.push(playerId);
         }
     };
 
     return {
         ...state,
-        currentPlayers: currentPlayers.filter(x => tmpInvalidPlayers.indexOf(x) < 0),
-        invalidPlayers: tmpInvalidPlayers,
+        players: players.filter(x => playersNotFound.indexOf(x) < 0),
+        invalidPlayers: invalidPlayers.concat(playersNotFound),
         currentTimeISO: new Date().toISOString()
     }
 }

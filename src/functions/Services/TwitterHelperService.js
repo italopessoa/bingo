@@ -55,20 +55,38 @@ const oauthGet = (url) => new Promise((resolve, reject) => {
 });
 
 const validatePlayer = async (userId) => {
-    try {
-        var response = await oauthGet(`https://api.twitter.com/2/users/${userId}`);
-        return response.data.username;
-    } catch (error) {
-        return null;
+    let result = {
+        isValid: false,
+        userName: null
     }
+
+    try {
+
+        var response = await oauthGet(`https://api.twitter.com/2/users/${userId}`);
+        result.isValid = true;
+        result.userName = response.data.username;
+
+        return result;
+    } catch (error) {
+        return result;
+    }
+
 }
 
-const getRetweetsFor = async (id) => {
+const getPlayerSubscriptionRetweetsFor = async (id) => {
     console.log("Trying to get retweets for Bingo advertisement message.");
     const result = await oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
     console.log(`${result.ids.length} messages found`);
 
     return result;
+}
+
+const checkUserIsFollowing = async (id) => {
+    console.log("Checking relationship between accounts");
+    const result = await oauthGet(`https://api.twitter.com/1.1/friendships/show.json?source_screen_name=ItaloNeyPessoa&target_screen_name=awscloud`);
+    console.log(result);
+
+    return result.relationship.target.following;
 }
 const postStatusUpdate = (message) => oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
     ...message
@@ -122,9 +140,10 @@ const sendDirectMessageWithTicket = (recipient_id, message) => oauthPost(`https:
 exports.oauthGet = oauthGet;
 exports.oauthPost = oauthPost;
 exports.validatePlayer = validatePlayer;
-exports.getRetweetsFor = getRetweetsFor;
+exports.getPlayerSubscriptionRetweetsFor = getPlayerSubscriptionRetweetsFor;
 exports.postStatusUpdate = postStatusUpdate;
 exports.destroyMessage = destroyMessage;
 exports.createImageMedia = createImageMedia;
 exports.searchWinners = searchWinners;
 exports.sendDirectMessageWithTicket = sendDirectMessageWithTicket;
+exports.checkUserIsFollowing = checkUserIsFollowing;

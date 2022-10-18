@@ -43,7 +43,7 @@ const getBingoNumbers = async () => {
     return numbers;
 }
 
-const updateNumbers = async (numbers, selectedNumber) => {
+const updateNumbers = async (numbers, selectedNumber, bingoExecutionName) => {
 
     var params = {
         TableName: "BingoRaffle",
@@ -51,7 +51,8 @@ const updateNumbers = async (numbers, selectedNumber) => {
             raffle: new Date().toLocaleDateString('pt-BR'),
             date: new Date().toISOString(),
             numbers: numbers.filter(i => i != selectedNumber),
-            selectedNumber: selectedNumber
+            selectedNumber: selectedNumber,
+            bingoExecutionName
         },
         ReturnValues: "ALL_OLD",
         ReturnItemCollectionMetrics: "SIZE"

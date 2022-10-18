@@ -33,7 +33,7 @@
       },
       "Wait for players subscription": {
         "Type": "Wait",
-        "Seconds": 20,
+        "Seconds": 30,
         "Next": "Register players"
       },
       "Register players": {

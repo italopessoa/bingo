@@ -1,5 +1,7 @@
 const TwitterService = require('../Services/TwitterHelperService');
 
+const isPlayerRegistered = (players, playerId) => players.find(id => id === playerId);
+
 /**
  *
  * State doc: 
@@ -10,16 +12,16 @@ const TwitterService = require('../Services/TwitterHelperService');
  * 
  */
 exports.handler = async (state) => {
-    const { bingoSubscriptionMessageId, currentPlayers } = state;
+    const { bingoSubscriptionMessageId, players } = state;
 
-    var players = currentPlayers ?? [];
-    const newPlayers = (await TwitterService.getRetweetsFor(bingoSubscriptionMessageId))
+    const newPlayers = (await TwitterService.getPlayerSubscriptionRetweetsFor(bingoSubscriptionMessageId))
         .ids
-        .filter(item => players.indexOf(item) < 0);
+        .filter(playerId => !isPlayerRegistered(players, playerId));
 
+    await TwitterService.checkUserIsFollowing(1);
     return {
         ...state,
-        currentPlayers: players.concat(newPlayers),
+        players: players.concat(newPlayers),
         newPlayers
     }
 };
