@@ -121,11 +121,39 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Any number available?",
+        "Next": "Process called number",
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
         }
+      },
+      "Process called number": {
+        "Type": "Parallel",
+        "Next": "Any number available?",
+        "Branches": [
+          {
+            "StartAt": "Pass",
+            "States": {
+              "Pass": {
+                "Type": "Pass",
+                "End": true
+              }
+            }
+          },
+          {
+            "StartAt": "Save Twitter messages for processing",
+            "States": {
+              "Save Twitter messages for processing": {
+                "Type": "Task",
+                "Resource": "${BingoMessagesQueueArn}",
+                "Parameters": {
+                  "MessageBody.$": "$.input.publishedMessage"
+                },
+                "End": true
+              }
+            }
+          }
+        ]
       },
       "Any number available?": {
         "Type": "Choice",

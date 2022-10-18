@@ -35,6 +35,7 @@ exports.handler = async (state) => {
         lastBallCalledDate: new Date(numberCall.created_at).toISOString(),
         count: 1 + (state.count ?? 0),
         calledNumbers,
-        publishedMessages: [...state.publishedMessages, numberCall.id_str]
+        publishedMessages: [...state.publishedMessages, numberCall.id_str],
+        publishedMessage: numberCall.id_str
     }
 }
