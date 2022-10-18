@@ -121,7 +121,7 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Any number available?",
+        "Next": "Wait for player to check their tickets",
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
@@ -146,7 +146,7 @@
             "Next": "Process pulished messages"
           }
         ],
-        "Default": "Wait for player to check their tickets"
+        "Default": "Draw a number"
       },
       "Wait for player to check their tickets": {
         "Type": "Wait",
@@ -187,7 +187,7 @@
             "Next": "Notify winner"
           }
         ],
-        "Default": "Draw a number"
+        "Default": "Any number available?"
       },
       "Notify winner": {
         "Type": "Task",
