@@ -3,24 +3,29 @@ const TwitterService = require('../Services/TwitterHelperService');
 const DynamoDBService = require('../Services/DynamoDBHelperService');
 const { board, images } = require('../assets');
 
-let numbers = [...Array(75)].map((item, currentIndex) => {
-    return { [currentIndex + 1]: false }
+const bingoNumbers = [...Array(75)].map((item, currentIndex) => {
+    return currentIndex + 1
 });
 
 const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 
-const getCardNumbersByGroup = (n, size, min, max) =>
-    (getRandomNumber(1, 9999999) % 2 == 0) ? fillByOrder(n, size, min, max) : fillRandom(size, min, max);
+const getTicketNumbersByGroup = (numbers, size, minimumValue, maximumValue) => {
+    if (getRandomNumber(1, 9999999) % 2 == 0) {
+        return fillByOrder(numbers, size, minimumValue, maximumValue);
+    } else {
+        return fillRandom(size, minimumValue, maximumValue);
+    }
+}
 
 const generateCardNumbers = () => {
 
-    var userCard = [];
-    board.forEach((item => {
-        var cardColumn = getCardNumbersByGroup(numbers, item.cardMax, item.min, item.max);
-        userCard = userCard.concat(cardColumn);
+    var ticket = [];
+    board.forEach((numberGroup => {
+        var ticketColumn = getTicketNumbersByGroup(bingoNumbers, numberGroup.cardMax, numberGroup.min, numberGroup.max);
+        ticket = ticket.concat(ticketColumn);
     }));
 
-    return userCard;
+    return ticket;
 }
 
 const fillRandom = (size, min, max) => {
@@ -34,11 +39,10 @@ const fillRandom = (size, min, max) => {
     return list;
 }
 
-const fillByOrder = (n, size, min, max) => {
-    var columnNumbersRange = n
-        .map(value => parseInt(Object.keys(value)[0]))
-        .filter(x => {
-            return x >= min && x <= max;
+const fillByOrder = (numbers, size, min, max) => {
+    var columnNumbersRange = numbers
+        .filter(number => {
+            return number >= min && number <= max;
         });
 
     let cardColumn = [];

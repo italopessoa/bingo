@@ -13,11 +13,11 @@ const pickRandomNumber = (numbers) => {
 }
 
 const postSelectedNumber = async (group, number) => {
-    // var numberMedia = await TwitterService.createImageMedia(images[number]);
-    // var groupMedia = await TwitterService.createImageMedia(images[group]);
+    var numberMedia = await TwitterService.createImageMedia(images[number]);
+    var groupMedia = await TwitterService.createImageMedia(images[group]);
     return await TwitterService.postStatusUpdate({
-        status: `Na letra ${group}: ${number}`//,
-        //media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
+        status: `Na letra ${group}: ${number}`,
+        media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
     });
 }
 

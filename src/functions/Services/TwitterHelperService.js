@@ -13,6 +13,9 @@ const getOAuth = () => new OAuth.OAuth(
     '1.0A', null, 'HMAC-SHA1'
 );
 
+const TWITTER_API_V1_1 = 'https://api.twitter.com/1.1';
+const TWITTER_API_V2 = 'https://api.twitter.com/2';
+
 const oauthPost = (url, body = null, contentType = "application/json") => new Promise((resolve, reject) => {
     getOAuth().post(url,
         oauth_token,
@@ -62,7 +65,7 @@ const validatePlayer = async (userId) => {
 
     try {
 
-        var response = await oauthGet(`https://api.twitter.com/2/users/${userId}`);
+        var response = await oauthGet(`${TWITTER_API_V2}/users/${userId}`);
         result.isValid = true;
         result.userName = response.data.username;
 
@@ -75,7 +78,7 @@ const validatePlayer = async (userId) => {
 
 const getUserName = async (userId) => {
     try {
-        var response = await oauthGet(`https://api.twitter.com/2/users/${userId}`);
+        var response = await oauthGet(`${TWITTER_API_V2}/users/${userId}`);
         result.userName = response.data.username;
 
         return response.data.username;
@@ -87,7 +90,7 @@ const getUserName = async (userId) => {
 
 const getPlayerSubscriptionRetweetsFor = async (id) => {
     console.log("Trying to get retweets for Bingo advertisement message.");
-    const result = await oauthGet(`https://api.twitter.com/1.1/statuses/retweeters/ids.json?id=${id}&count=100`);
+    const result = await oauthGet(`${TWITTER_API_V1_1}/statuses/retweeters/ids.json?id=${id}&count=100`);
     console.log(`${result.ids.length} messages found`);
 
     return result;
@@ -95,16 +98,16 @@ const getPlayerSubscriptionRetweetsFor = async (id) => {
 
 const getTargetUserRelationship = async (userTargetId) => {
     console.log("Checking relationship between accounts");
-    const result = await oauthGet(`https://api.twitter.com/1.1/friendships/show.json?source_screen_name=ItaloNeyPessoa&target_id=${userTargetId}`);
+    const result = await oauthGet(`${TWITTER_API_V1_1}/friendships/show.json?source_screen_name=ItaloNeyPessoa&target_id=${userTargetId}`);
     console.log(result);
 
     return result.relationship.target;
 }
-const postStatusUpdate = (message) => oauthPost('https://api.twitter.com/1.1/statuses/update.json', {
+const postStatusUpdate = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/update.json`, {
     ...message
 }, 'application/x-www-form-urlencoded');
 
-const destroyMessage = (message) => oauthPost(`https://api.twitter.com/1.1/statuses/destroy/${message}.json`);
+const destroyMessage = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/destroy/${message}.json`);
 
 
 const createImageMedia = (imageBase64Text) => oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
@@ -115,13 +118,13 @@ const createImageMedia = (imageBase64Text) => oauthPost('https://upload.twitter.
 
 const searchWinners = async () => {
     console.log("Trying to get players who claim victory on Twitter.");
-    const result = await oauthGet(`https://api.twitter.com/1.1/search/tweets.json?q=%23bingobati&result_type=recent`);
+    const result = await oauthGet(`${TWITTER_API_V1_1}/search/tweets.json?q=%23bingobati&result_type=recent`);
     console.log("These users were found: ", JSON.stringify(result.statuses));
 
     return result;
 }
 
-const sendDirectMessageWithTicket = (recipient_id, message) => oauthPost(`https://api.twitter.com/1.1/direct_messages/events/new.json`,
+const sendDirectMessageWithTicket = (recipient_id, message) => oauthPost(`${TWITTER_API_V1_1}/direct_messages/events/new.json`,
     JSON.stringify({
         event: {
             type: "message_create",

@@ -9,7 +9,7 @@ const validateWinners = (calledNumbers, userCards) => {
 }
 
 exports.handler = async (state) => {
-    const { currentPlayers, lastBallCalledDate, players } = state;
+    const { lastBallCalledDate, players } = state;
 
     let winners = await TwitterService.searchWinners();
 
