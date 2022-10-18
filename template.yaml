@@ -220,6 +220,7 @@ Resources:
     Properties:
       QueueName: BingoMessages.fifo
       FifoQueue:  true
+      ContentBasedDeduplication: true
       Tags:
         - Key: project
           Value: sam-bingo-app

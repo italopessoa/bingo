@@ -121,38 +121,19 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Process called number",
+        "Next": "Any number available?",
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
-        }
-      },
-      "Process called number": {
-        "Type": "Parallel",
-        "Next": "Any number available?",
-        "Branches": [
+        },
+        "Catch": [
           {
-            "StartAt": "Pass",
-            "States": {
-              "Pass": {
-                "Type": "Pass",
-                "End": true
-              }
-            }
-          },
-          {
-            "StartAt": "Save Twitter messages for processing",
-            "States": {
-              "Save Twitter messages for processing": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::sqs:sendMessage",
-                "Parameters": {
-                  "MessageBody.$": "$.input.publishedMessage",
-                  "QueueUrl": "${BingoMessagesQueueFIFOUrl}"
-                },
-                "End": true
-              }
-            }
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "Comment": "deu ruim",
+            "Next": "Process pulished messages",
+            "ResultPath": "$.error"
           }
         ]
       },
@@ -162,7 +143,7 @@
           {
             "Variable": "$.count",
             "NumericEquals": 24,
-            "Next": "Destroy messages"
+            "Next": "Process pulished messages"
           }
         ],
         "Default": "Wait for player to check their tickets"
@@ -231,29 +212,27 @@
         "ResultSelector": {
           "state.$": "$.Payload"
         },
-        "Next": "Destroy messages"
+        "Next": "Process pulished messages"
       },
-      "Destroy messages": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "Parameters": {
-          "Payload.$":"$",
-          "FunctionName":"${DestroyMessagesFunctionArn}"
-        },
-        "OutputPath": "$.Payload",
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException"
-            ],
-            "IntervalSeconds": 2,
-            "MaxAttempts": 6,
-            "BackoffRate": 2
+      "Process pulished messages": {
+        "Type": "Map",
+        "Iterator": {
+          "StartAt": "Save Twitter messages for processing",
+          "States": {
+            "Save Twitter messages for processing": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage",
+              "Parameters": {
+                "MessageBody.$": "$",
+                "QueueUrl": "${BingoMessagesQueueFIFOUrl}",
+                "MessageGroupId": "samp-bingo-app-tweets"
+              },
+              "End": true
+            }
           }
-        ],
-        "End": true
+        },
+        "End": true,
+        "ItemsPath": "$.publishedMessages"
       }
     }
   }
