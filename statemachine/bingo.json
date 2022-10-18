@@ -145,7 +145,7 @@
             "States": {
               "Save Twitter messages for processing": {
                 "Type": "Task",
-                "Resource": "${BingoMessagesQueueArn}",
+                "Resource": "${BingoMessagesQueueFIFOArn}",
                 "Parameters": {
                   "MessageBody.$": "$.input.publishedMessage"
                 },
