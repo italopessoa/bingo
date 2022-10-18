@@ -217,7 +217,7 @@ Resources:
   BingoMessagesQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: BingoMessages
+      QueueName: BingoMessages.fifo
       FifoQueue:  true
       Tags:
         - Key: project
