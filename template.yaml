@@ -40,7 +40,7 @@ Resources:
         FindWinnerFunctionArn: !GetAtt FindWinnerFunction.Arn
         NotifyWinnerFunctionArn: !GetAtt NotifyWinnerFunction.Arn
         DestroyMessagesFunctionArn: !GetAtt DestroyMessagesFunction.Arn
-        BingoMessagesQueueFIFOArn: !GetAtt BingoMessagesQueueFIFO.Arn
+        BingoMessagesQueueFIFOUrl: !Ref BingoMessagesQueueFIFO
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
             FunctionName: !Ref PostBingoBannerFunction
@@ -57,7 +57,7 @@ Resources:
         - LambdaInvokePolicy:
             FunctionName: !Ref DestroyMessagesFunction
         - SQSSendMessagePolicy:
-            QueueName: !Ref BingoMessagesQueueFIFO
+            QueueName: !GetAtt BingoMessagesQueueFIFO.QueueName
 
   PostBingoBannerFunction:
     Type: AWS::Serverless::Function
@@ -214,7 +214,6 @@ Resources:
       Tags:
         - Key: Project
           Value: sam-bingo-app
-
 
   BingoMessagesQueueFIFO:
     Type: AWS::SQS::Queue

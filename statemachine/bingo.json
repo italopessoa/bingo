@@ -145,9 +145,10 @@
             "States": {
               "Save Twitter messages for processing": {
                 "Type": "Task",
-                "Resource": "${BingoMessagesQueueFIFOArn}",
+                "Resource": "arn:aws:states:::sqs:sendMessage",
                 "Parameters": {
-                  "MessageBody.$": "$.input.publishedMessage"
+                  "MessageBody.$": "$.input.publishedMessage",
+                  "QueueUrl": "${BingoMessagesQueueFIFOUrl}"
                 },
                 "End": true
               }
