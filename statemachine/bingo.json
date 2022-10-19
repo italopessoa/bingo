@@ -29,7 +29,16 @@
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
-        }
+        },
+        "Catch": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "Next": "Send error message",
+            "ResultPath": "$.error"
+          }
+        ]
       },
       "Wait for players subscription": {
         "Type": "Wait",
@@ -59,7 +68,16 @@
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
-        }
+        },
+        "Catch": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "Next": "Send error message",
+            "ResultPath": "$.error"
+          }
+        ]
       },
       "Create tickets": {
         "Type": "Task",
@@ -85,7 +103,16 @@
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
-        }
+        },
+        "Catch": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "Next": "Send error message",
+            "ResultPath": "$.error"
+          }
+        ]
       },
       "Is is time to draw the numbers?": {
         "Type": "Choice",
@@ -131,8 +158,7 @@
             "ErrorEquals": [
               "States.ALL"
             ],
-            "Comment": "deu ruim",
-            "Next": "Process pulished messages",
+            "Next": "Send error message",
             "ResultPath": "$.error"
           }
         ]
@@ -143,7 +169,7 @@
           {
             "Variable": "$.count",
             "NumericEquals": 24,
-            "Next": "Process pulished messages"
+            "Next": "Save Twitter messages for processing"
           }
         ],
         "Default": "Draw a number"
@@ -176,7 +202,16 @@
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
-        }
+        },
+        "Catch": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "Next": "Send error message",
+            "ResultPath": "$.error"
+          }
+        ]
       },
       "Any winner?": {
         "Type": "Choice",
@@ -212,27 +247,51 @@
         "ResultSelector": {
           "state.$": "$.Payload"
         },
-        "Next": "Process pulished messages"
-      },
-      "Process pulished messages": {
-        "Type": "Map",
-        "Iterator": {
-          "StartAt": "Save Twitter messages for processing",
-          "States": {
-            "Save Twitter messages for processing": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::sqs:sendMessage",
-              "Parameters": {
-                "MessageBody.$": "$",
-                "QueueUrl": "${BingoMessagesQueueFIFOUrl}",
-                "MessageGroupId": "samp-bingo-app-tweets"
-              },
-              "End": true
-            }
+        "Catch": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "Next": "Send error message",
+            "ResultPath": "$.error"
           }
+        ],
+        "Next": "Save Twitter messages for processing"
+      },
+      "Send error message":{
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "Parameters": {
+          "Payload.$":"$",
+          "FunctionName":"${SendErrorMessageFunctionArn}"
         },
-        "End": true,
-        "ItemsPath": "$.publishedMessages"
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "OutputPath": "$.state",
+        "ResultSelector": {
+          "state.$": "$.Payload"
+        },
+        "Next": "Save Twitter messages for processing"
+      },
+      "Save Twitter messages for processing": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::sqs:sendMessage",
+        "Parameters": {
+          "MessageBody.$": "$",
+          "QueueUrl": "${BingoMessagesQueueFIFOUrl}",
+          "MessageGroupId": "samp-bingo-app-tweets"
+        },
+        "End": true
       }
     }
   }

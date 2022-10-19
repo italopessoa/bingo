@@ -33,7 +33,7 @@ exports.handler = async (state) => {
     return {
         ...state,
         lastBallCalledDate: new Date(numberCall.created_at).toISOString(),
-        count: state.count++,
+        count: state.count += 1,
         calledNumbers,
         publishedMessages: [...state.publishedMessages, numberCall.id_str]
     }
