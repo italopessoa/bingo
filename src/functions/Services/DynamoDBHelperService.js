@@ -20,47 +20,6 @@ const getUserCard = async (user_id, winnerNotificationReferenceMessageId) => {
     return userTicket;
 }
 
-const getBingoNumbers = async () => {
-    var response = await dynamodb.query({
-        TableName: "BingoRaffle",
-        KeyConditionExpression: "raffle = :date",
-        ExpressionAttributeValues: {
-            ":date": new Date().toLocaleDateString('pt-BR'),
-        },
-        ScanIndexForward: false,
-        Limit: 1
-    }).promise();
-
-    let numbers = [];
-
-    if (response.Count == 0) {
-        numbers = [...Array(25)]
-            .map((item, currentIndex) => currentIndex + 1)
-            .sort(() => 0.5 - Math.random());
-    } else {
-        numbers = response.Items[0].numbers;
-    }
-    return numbers;
-}
-
-const updateNumbers = async (numbers, selectedNumber, bingoExecutionName) => {
-
-    var params = {
-        TableName: "BingoRaffle",
-        Item: {
-            raffle: new Date().toLocaleDateString('pt-BR'),
-            date: new Date().toISOString(),
-            numbers: numbers.filter(i => i != selectedNumber),
-            selectedNumber: selectedNumber,
-            bingoExecutionName
-        },
-        ReturnValues: "ALL_OLD",
-        ReturnItemCollectionMetrics: "SIZE"
-    };
-
-    await dynamodb.put(params).promise();
-}
-
 const tryToSaveBingoTicket = async (ticketHash, playerId, numbers, userName, bingoExecutionName) => {
 
     try {
@@ -87,6 +46,4 @@ const tryToSaveBingoTicket = async (ticketHash, playerId, numbers, userName, bin
 }
 
 exports.getUserCard = getUserCard;
-exports.getBingoNumbers = getBingoNumbers;
-exports.updateNumbers = updateNumbers;
 exports.tryToSaveBingoTicket = tryToSaveBingoTicket;

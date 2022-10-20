@@ -208,31 +208,6 @@ Resources:
         - Key: Project
           Value: sam-bingo-app
 
-  BingoRaffleTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - 
-          AttributeName: raffle
-          AttributeType: "S"
-        - 
-          AttributeName: date
-          AttributeType: "S"
-      KeySchema:
-        - 
-          AttributeName: raffle
-          KeyType: "HASH"
-        - 
-          AttributeName: date
-          KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5 
-      TableName: BingoRaffle
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
-
   BingoMessagesQueueFIFO:
     Type: AWS::SQS::Queue
     Properties:
@@ -250,17 +225,6 @@ Resources:
         Id: CreateTicketFunction
       Destination:
         Id: BingoTicketTable
-      Permissions:
-        - Write
-        - Read
-
-  NumbersDrawTableConnection:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: NumbersDrawFunction
-      Destination:
-        Id: BingoRaffleTable
       Permissions:
         - Write
         - Read

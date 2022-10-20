@@ -11,12 +11,18 @@ const add_minutes = (dt, minutes) => new Date(dt.getTime() + minutes * 60000);
  * @returns {Object} state - Return initial state
  * 
  */
+
+const getAvailableNumbers = () => [...Array(25)]
+    .map((item, currentIndex) => currentIndex + 1)
+    .sort(() => 0.5 - Math.random());
+
 exports.handler = async (input) => {
     const { StartTime, ExecutionName: executionName } = input;
 
     var response = await TwitterService.postStatusUpdate({
         status: `Play at: ${StartTime} - Start at:${add_minutes(new Date(StartTime), 10)}`
     });
+    const numbers = getAvailableNumbers();
 
     return {
         executionName,
@@ -27,6 +33,8 @@ exports.handler = async (input) => {
         bingoStartTimeISO: add_minutes(new Date(StartTime), 0).toISOString(),
         players: [],
         invalidPlayers: [],
-        count: 0
+        calledNumbers: [],
+        numbers,
+        numbersCount: numbers.length - 1
     }
 }

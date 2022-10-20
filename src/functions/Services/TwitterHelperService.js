@@ -109,12 +109,10 @@ const postStatusUpdate = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/up
 
 const destroyMessage = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/destroy/${message}.json`);
 
-
 const createImageMedia = (imageBase64Text) => oauthPost('https://upload.twitter.com/1.1/media/upload.json', {
     media_data: imageBase64Text,
     media_category: "tweet_image"
 }, 'multipart/form-data');
-
 
 const searchWinners = async () => {
     console.log("Trying to get players who claim victory on Twitter.");

@@ -167,8 +167,8 @@
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.count",
-            "NumericEquals": 24,
+            "Variable": "$.numbersCount",
+            "NumericEquals": 0,
             "Next": "Save Twitter messages for processing"
           }
         ],

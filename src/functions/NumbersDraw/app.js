@@ -1,6 +1,4 @@
 const TwitterService = require('../Services/TwitterHelperService');
-const DynamoDBService = require('../Services/DynamoDBHelperService');
-
 const { board, images } = require('../assets');
 
 const getNumberGroup = (number) => {
@@ -21,20 +19,26 @@ const postSelectedNumber = async (group, number) => {
     });
 }
 
+const getNonCalledNumbers = (numbers, calledNumbers) => {
+    return numbers
+        .filter(number => calledNumbers.indexOf(number) < 0);
+}
+
 exports.handler = async (state) => {
-    let calledNumbers = state.calledNumbers ?? [];
-    let numbers = await DynamoDBService.getBingoNumbers();
+    let calledNumbers = state.calledNumbers;
+    let numbers = getNonCalledNumbers(state.numbers, calledNumbers);
     let selectedNumber = pickRandomNumber(numbers);
     let group = getNumberGroup(selectedNumber);
-    var numberCall = await postSelectedNumber(group, selectedNumber, state.executionName);
-    await DynamoDBService.updateNumbers(numbers, selectedNumber);
+    var numberCall = await postSelectedNumber(group, selectedNumber);
     calledNumbers.push(selectedNumber);
-
+    const updatedNumbers = getNonCalledNumbers(state.numbers, calledNumbers);
+    
     return {
         ...state,
         lastBallCalledDate: new Date(numberCall.created_at).toISOString(),
-        count: state.count += 1,
         calledNumbers,
+        numbers: updatedNumbers,
+        numbersCount: updatedNumbers.length,
         publishedMessages: [...state.publishedMessages, numberCall.id_str]
     }
 }
