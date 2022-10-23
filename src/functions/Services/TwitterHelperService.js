@@ -1,9 +1,20 @@
 const OAuth = require('oauth');
 
-let oauth_consumer_key = process.env.CONSUMER_KEY;
-let oauth_consumer_secret = process.env.CONSUMER_SECRET;
-let oauth_token = process.env.TOKEN;
-let oauth_token_secret = process.env.SECRET;
+const oauth_consumer_key = process.env.CONSUMER_KEY;
+const oauth_consumer_secret = process.env.CONSUMER_SECRET;
+const oauth_token = process.env.TOKEN;
+const oauth_token_secret = process.env.SECRET;
+
+const TWITTER_API_V1_1 = 'https://api.twitter.com/1.1';
+const TWITTER_API_V2 = 'https://api.twitter.com/2';
+
+const MessageTypes = {
+    ERROR_MESSAGE: 'ERROR_MESSAGE',
+    STATUS_MESSAGE: 'STATUS_MESSAGE',
+    STATUS_RESPONSE_MESSAGE: 'STATUS_RESPONSE_MESSAGE',
+    STATUS_MESSAGE_WITH_IMAGE_MEDIA: 'STATUS_MESSAGE_WITH_IMAGE_MEDIA',
+    DIRECT_MESSAGE: 'DIRECT_MESSAGE'
+};
 
 const getOAuth = () => new OAuth.OAuth(
     'https://api.twitter.com/oauth/request_token',
@@ -12,9 +23,6 @@ const getOAuth = () => new OAuth.OAuth(
     oauth_consumer_secret,
     '1.0A', null, 'HMAC-SHA1'
 );
-
-const TWITTER_API_V1_1 = 'https://api.twitter.com/1.1';
-const TWITTER_API_V2 = 'https://api.twitter.com/2';
 
 const oauthPost = (url, body = null, contentType = "application/json") => new Promise((resolve, reject) => {
     getOAuth().post(url,
@@ -73,13 +81,11 @@ const validatePlayer = async (userId) => {
     } catch (error) {
         return result;
     }
-
 }
 
 const getUserName = async (userId) => {
     try {
         var response = await oauthGet(`${TWITTER_API_V2}/users/${userId}`);
-        result.userName = response.data.username;
 
         return response.data.username;
     } catch (error) {
@@ -103,9 +109,60 @@ const getTargetUserRelationship = async (userTargetId) => {
 
     return result.relationship.target;
 }
-const postStatusUpdate = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/update.json`, {
+
+const createStatusMessage = (body) => {
+    return { status: body.message };
+};
+
+const createStatusResponseMessage = (body) => {
+    return { status: body.message, in_reply_to_status_id: body.inResponseToMessageId };
+};
+
+const createErrorMessage = (body) => {
+    return { status: body.message };
+};
+
+const createDirectMessage = (body) => {
+    return {
+        event: {
+            type: "message_create",
+            message_create: {
+                target: {
+                    recipient_id: `${body.recipientId}`
+                },
+                message_data: {
+                    text: body.message
+                }
+            }
+        }
+    }
+};
+
+const createMediaIds = async (mediaImagesBase64) => {
+    let media_ids = [];
+    for (var i = 0; i < mediaImagesBase64.length; i++) {
+        media_ids.push((await createImageMedia(mediaImagesBase64[i])).media_id_string);
+    }
+    return media_ids;
+}
+
+const createMessageWithImageMedia = async (body) => {
+    let media_ids = await createMediaIds(body.mediaImagesBase64);
+    return { status: body.message, media_ids: media_ids.join(',') };
+};
+
+const sendStatusMessage = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/update.json`, {
     ...message
 }, 'application/x-www-form-urlencoded');
+
+const sendDirectMessage = (message) => {
+    console.log('[sendDirectMessage], ', message);
+    return oauthPost(`${TWITTER_API_V1_1}/direct_messages/events/new.json`,
+        JSON.stringify({
+            ...message
+        }),
+        'application/json');
+};
 
 const destroyMessage = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/destroy/${message}.json`);
 
@@ -122,42 +179,45 @@ const searchWinners = async () => {
     return result;
 }
 
-const sendDirectMessageWithTicket = (recipient_id, message) => oauthPost(`${TWITTER_API_V1_1}/direct_messages/events/new.json`,
-    JSON.stringify({
-        event: {
-            type: "message_create",
-            message_create: {
-                target: {
-                    recipient_id: `${recipient_id}`
-                },
-                message_data: {
-                    text: message,
-                    ctas: [
-                        {
-                            "type": "web_url",
-                            "label": "So noticia top",
-                            "url": "http://www.diariodequixada.com.br/"
-                        },
-                        {
-                            "type": "web_url",
-                            "label": "Site de putaria",
-                            "url": "https://www.youtube.com/watch?v=8R-SVel6NVAt"
-                        }
-                    ]
-                },
-            }
-        }
-    }),
-    'application/json');
+const createMessageFunctions = {
+    [MessageTypes.ERROR_MESSAGE]: createErrorMessage,
+    [MessageTypes.STATUS_MESSAGE]: createStatusMessage,
+    [MessageTypes.STATUS_RESPONSE_MESSAGE]: createStatusResponseMessage,
+    [MessageTypes.STATUS_MESSAGE_WITH_IMAGE_MEDIA]: createMessageWithImageMedia,
+    [MessageTypes.DIRECT_MESSAGE]: createDirectMessage
+}
 
-exports.oauthGet = oauthGet;
-exports.oauthPost = oauthPost;
-exports.validatePlayer = validatePlayer;
+const sendMessageFunctions = {
+    [MessageTypes.ERROR_MESSAGE]: sendStatusMessage,
+    [MessageTypes.STATUS_MESSAGE]: sendStatusMessage,
+    [MessageTypes.STATUS_RESPONSE_MESSAGE]: sendStatusMessage,
+    [MessageTypes.STATUS_MESSAGE_WITH_IMAGE_MEDIA]: sendStatusMessage,
+    [MessageTypes.DIRECT_MESSAGE]: sendDirectMessage
+}
+
+/** 
+ * @param {{
+ * messageType,
+ * message,
+ * mediaImagesBase64,
+ * recipienteId}} body paramaters to create messages depending on messageType
+ * 
+ * @returns {{create:function, send: function(message)}} factory methods to create and send twitter message
+ */
+const twitterMessageFactory = (body) => {
+    var functionToCreateMessage = createMessageFunctions[body.messageType];
+    var functionToSendMessage = sendMessageFunctions[body.messageType];
+
+    return {
+        create: () => functionToCreateMessage(body),
+        send: functionToSendMessage
+    }
+};
+
 exports.getPlayerSubscriptionRetweetsFor = getPlayerSubscriptionRetweetsFor;
-exports.postStatusUpdate = postStatusUpdate;
 exports.destroyMessage = destroyMessage;
-exports.createImageMedia = createImageMedia;
 exports.searchWinners = searchWinners;
-exports.sendDirectMessageWithTicket = sendDirectMessageWithTicket;
 exports.getTargetUserRelationship = getTargetUserRelationship;
-exports.getUserName = getUserName;
+exports.getTwitterUserName = getUserName;
+exports.twitterMessageFactory = twitterMessageFactory;
+exports.MessageTypes = MessageTypes;

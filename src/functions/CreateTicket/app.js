@@ -1,7 +1,7 @@
 const crypto = require('crypto');
-const TwitterService = require('../Services/TwitterHelperService');
+const { twitterMessageFactory, MessageTypes, getTwitterUserName } = require('../Services/TwitterHelperService');
 const DynamoDBService = require('../Services/DynamoDBHelperService');
-const { board, images } = require('../assets');
+const { board } = require('../assets');
 
 const bingoNumbers = [...Array(75)].map((item, currentIndex) => {
     return currentIndex + 1
@@ -70,15 +70,28 @@ const generateCard = async (playerId, username, bingoExecutionName) => {
     return userCard;
 }
 
+async function createAndSendTicketMessage(newPlayers, player, executionName) {
+    let body = {
+        messageType: MessageTypes.DIRECT_MESSAGE
+    };
+
+    const playerId = newPlayers[player];
+    const userName = await getTwitterUserName(playerId);
+    let ticket = await generateCard(playerId, userName, executionName);
+
+    body.message = "sua cartela = " + ticket.join('-');
+    body.recipientId = playerId;
+
+    let messageFactory = twitterMessageFactory(body);
+    let message = await messageFactory.create();
+    await messageFactory.send(message);
+}
 
 exports.handler = async (state) => {
     const { newPlayers, executionName } = state;
 
     for (let player in newPlayers) {
-        const playerId = newPlayers[player]
-        const userName = await TwitterService.getUserName(playerId);
-        let ticket = await generateCard(playerId, userName, executionName);
-        await TwitterService.sendDirectMessageWithTicket(playerId, "sua cartela = " + ticket.join('-'));
+        await createAndSendTicketMessage(newPlayers, player, executionName);
     };
 
     return {
@@ -86,3 +99,5 @@ exports.handler = async (state) => {
         currentTimeISO: new Date().toISOString()
     }
 }
+
+

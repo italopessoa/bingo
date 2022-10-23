@@ -31,7 +31,7 @@ Resources:
   BingoStateMachine:
     Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
     Properties:
-      DefinitionUri: statemachine/bingo.json
+      DefinitionUri: statemachine/bingo.asl.json
       DefinitionSubstitutions:
         PostBingoBannerFunctionArn: !GetAtt PostBingoBannerFunction.Arn
         FindPlayersFunctionArn: !GetAtt FindPlayersFunction.Arn
