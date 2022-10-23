@@ -1,15 +1,22 @@
-const TwitterService = require('../Services/TwitterHelperService');
+const { twitterMessageFactory, MessageTypes } = require('../Services/TwitterHelperService');
+
+async function sendMessageToWinner(player) {
+    var body = {
+        messageType: MessageTypes.STATUS_RESPONSE_MESSAGE,
+        message: "parabens jovem voce ganhou " + new Date().toISOString(),
+        inResponseToMessageId: player.winnerNotificationReferenceMessageId
+    };
+
+    let messageFactory = twitterMessageFactory(body);
+    let message = await messageFactory.create();
+    let response = await messageFactory.send(message);
+    return response.id_str;
+}
 
 exports.handler = async (state) => {
-    let messages = []
+    let messages = [];
     for (let player of (state.winnersList ?? [])) {
-        var body = {
-            status: "parabens jovem voce ganhou " + new Date().toISOString(),
-            in_reply_to_status_id: player.winnerNotificationReferenceMessageId
-        };
-
-        var response = await TwitterService.postStatusUpdate(body);
-        messages.push(response.id_str);
+        messages.push(await sendMessageToWinner(player));
     }
 
     return {
@@ -17,3 +24,4 @@ exports.handler = async (state) => {
         publishedMessages: [...state.publishedMessages, ...messages]
     }
 }
+

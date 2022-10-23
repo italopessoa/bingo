@@ -1,4 +1,4 @@
-const TwitterService = require('../Services/TwitterHelperService');
+const { twitterMessageFactory, MessageTypes } = require('../Services/TwitterHelperService');
 const { board, images } = require('../assets');
 
 const getNumberGroup = (number) => {
@@ -11,12 +11,14 @@ const pickRandomNumber = (numbers) => {
 }
 
 const postSelectedNumber = async (group, number) => {
-    var numberMedia = await TwitterService.createImageMedia(images[number]);
-    var groupMedia = await TwitterService.createImageMedia(images[group]);
-    return await TwitterService.postStatusUpdate({
-        status: `Na letra ${group}: ${number}`,
-        media_ids: `${groupMedia.media_id_string},${numberMedia.media_id_string}`
-    });
+    let body = {
+        messageType: MessageTypes.STATUS_MESSAGE_WITH_IMAGE_MEDIA,
+        message: `Na letra ${group}: ${number}`,
+        mediaImagesBase64: [images[group], images[number]]
+    };
+    let messageFactory = twitterMessageFactory(body);
+    let message = await messageFactory.create();
+    return await messageFactory.send(message);
 }
 
 const getNonCalledNumbers = (numbers, calledNumbers) => {
@@ -32,7 +34,7 @@ exports.handler = async (state) => {
     var numberCall = await postSelectedNumber(group, selectedNumber);
     calledNumbers.push(selectedNumber);
     const updatedNumbers = getNonCalledNumbers(state.numbers, calledNumbers);
-    
+
     return {
         ...state,
         lastBallCalledDate: new Date(numberCall.created_at).toISOString(),

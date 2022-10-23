@@ -1,12 +1,12 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const getUserCard = async (user_id, winnerNotificationReferenceMessageId) => {
+const getUserCard = async (playerId, winnerNotificationReferenceMessageId) => {
     var params = {
         ExpressionAttributeValues: {
-            ":userId": user_id
+            ":playerId": playerId
         },
-        FilterExpression: "userId = :userId",
+        FilterExpression: "playerId = :playerId",
         TableName: "BingoTicket"
     };
 
@@ -14,7 +14,7 @@ const getUserCard = async (user_id, winnerNotificationReferenceMessageId) => {
 
     let userTicket = null;
     if (result.Count > 0) {
-        var userCard = result.Items[0].card.split('-').map(n => parseInt(n));
+        var userCard = result.Items[0].card;
         userTicket = { userName: result.Items[0].userName, userCard, winnerNotificationReferenceMessageId };
     }
     return userTicket;
@@ -27,8 +27,8 @@ const tryToSaveBingoTicket = async (ticketHash, playerId, numbers, userName, bin
             TableName: "BingoTicket",
             Item: {
                 TicketHash: ticketHash,
-                playerId: "" + playerId + "",
-                card: numbers.join('-'),
+                playerId: playerId,
+                card: numbers,
                 userName,
                 bingoExecutionName
             },

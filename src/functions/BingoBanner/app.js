@@ -1,4 +1,4 @@
-const TwitterService = require('../Services/TwitterHelperService');
+const { twitterMessageFactory, MessageTypes } = require('../Services/TwitterHelperService');
 
 const add_minutes = (dt, minutes) => new Date(dt.getTime() + minutes * 60000);
 
@@ -19,9 +19,15 @@ const getAvailableNumbers = () => [...Array(25)]
 exports.handler = async (input) => {
     const { StartTime, ExecutionName: executionName } = input;
 
-    var response = await TwitterService.postStatusUpdate({
-        status: `Play at: ${StartTime} - Start at:${add_minutes(new Date(StartTime), 10)}`
-    });
+    let body = {
+        messageType: MessageTypes.STATUS_MESSAGE,
+        message: `Play at: ${StartTime} - Start at:${add_minutes(new Date(StartTime), 10)}`
+    };
+
+    let messageFactory = twitterMessageFactory(body);
+    let message = await messageFactory.create();
+    let response = await messageFactory.send(message);
+
     const numbers = getAvailableNumbers();
 
     return {
