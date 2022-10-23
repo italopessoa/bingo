@@ -1,9 +1,9 @@
 const { twitterMessageFactory, MessageTypes } = require('../Services/TwitterHelperService');
 
-async function sendErrorMessage(message) {
+async function sendErrorMessage(messageContent) {
     var body = {
         messageType: MessageTypes.ERROR_MESSAGE,
-        message
+        message: messageContent
     };
 
     let messageFactory = twitterMessageFactory(body);

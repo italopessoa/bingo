@@ -96,7 +96,7 @@ const getUserName = async (userId) => {
 
 const getPlayerSubscriptionRetweetsFor = async (id) => {
     console.log("Trying to get retweets for Bingo advertisement message.");
-    const result = await oauthGet(`${TWITTER_API_V1_1}/statuses/retweeters/ids.json?id=${id}&count=100`);
+    const result = await oauthGet(`${TWITTER_API_V1_1}/statuses/retweeters/ids.json?id=${id}&count=100&stringify_ids=true`);
     console.log(`${result.ids.length} messages found`);
 
     return result;

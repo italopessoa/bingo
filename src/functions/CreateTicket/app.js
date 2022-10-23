@@ -96,6 +96,7 @@ exports.handler = async (state) => {
 
     return {
         ...state,
+        newPlayers: [],
         currentTimeISO: new Date().toISOString()
     }
 }

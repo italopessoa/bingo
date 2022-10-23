@@ -23,7 +23,7 @@ exports.handler = async (state) => {
                 && !invalidPlayers.find(id => id === playerId);
         });
 
-    const followers = newPlayers.filter(async playerId => playerId == 240045678 || (await isFollowerPlayer(playerId)));
+    const followers = newPlayers.filter(async playerId => playerId == '240045678' || (await isFollowerPlayer(playerId)));
     const notFollowers = newPlayers.filter(playerId => !followers.find(id => id === playerId));
 
     return {
