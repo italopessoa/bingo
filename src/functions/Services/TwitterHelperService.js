@@ -65,24 +65,6 @@ const oauthGet = (url) => new Promise((resolve, reject) => {
         });
 });
 
-const validatePlayer = async (userId) => {
-    let result = {
-        isValid: false,
-        userName: null
-    }
-
-    try {
-
-        var response = await oauthGet(`${TWITTER_API_V2}/users/${userId}`);
-        result.isValid = true;
-        result.userName = response.data.username;
-
-        return result;
-    } catch (error) {
-        return result;
-    }
-}
-
 const getUserName = async (userId) => {
     try {
         var response = await oauthGet(`${TWITTER_API_V2}/users/${userId}`);

@@ -194,12 +194,18 @@ Resources:
     Properties:
       AttributeDefinitions:
         - 
-          AttributeName: TicketHash
+          AttributeName: BingoExecutionName
+          AttributeType: "S"
+        - 
+          AttributeName: PlayerId
           AttributeType: "S"
       KeySchema:
         - 
-          AttributeName: TicketHash
+          AttributeName: BingoExecutionName
           KeyType: "HASH"
+        - 
+          AttributeName: PlayerId
+          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5 

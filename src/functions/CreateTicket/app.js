@@ -20,7 +20,7 @@ exports.handler = async (state) => {
 async function createAndSendTicketMessage(newPlayers, player, executionName) {
     const playerId = newPlayers[player];
     const userName = await getTwitterUserName(playerId);
-    let ticket = await generateCard(playerId, userName, executionName);
+    let ticket = await generateTicket(playerId, userName, executionName);
 
     await twitterMessageFactory(MessageTypes.DIRECT_MESSAGE, {
         message: "sua cartela = " + ticket.join('-'),
@@ -28,9 +28,9 @@ async function createAndSendTicketMessage(newPlayers, player, executionName) {
     }).buildAndSend();
 }
 
-const generateCard = async (playerId, username, bingoExecutionName) => {
+const generateTicket = async (playerId, username, bingoExecutionName) => {
 
-    let userCard = generateCardNumbers();
+    let userCard = generateTicketNumbers();
     let cardCreated = false;
     do {
         var cardCopy = [...userCard];
@@ -44,7 +44,7 @@ const generateCard = async (playerId, username, bingoExecutionName) => {
     return userCard;
 }
 
-const generateCardNumbers = () => {
+const generateTicketNumbers = () => {
     let ticket = [];
     board.forEach((numberGroup => {
         var ticketColumn = getTicketNumbersByGroup(getBingoNumbers(), numberGroup.cardMax, numberGroup.min, numberGroup.max);

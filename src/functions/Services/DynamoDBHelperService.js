@@ -1,49 +1,58 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const getUserCard = async (playerId, winnerNotificationReferenceMessageId) => {
-    var params = {
-        ExpressionAttributeValues: {
-            ":playerId": playerId
-        },
-        FilterExpression: "playerId = :playerId",
-        TableName: "BingoTicket"
-    };
+const getUserTicket = async (playerId, bingoExecutionName, winnerNotificationReferenceMessageId) => {
+    try {
+        console.log(`Trying to get Bingo_(${bingoExecutionName}) ticket for Player: ${playerId}`);
+        
+        var params = {
+            ExpressionAttributeValues: {
+                ":bingoExecutionName": bingoExecutionName,
+                ":playerId": playerId
+            },
+            KilterExpression: "BingoExecutionName = :bingoExecutionName AND PlayerId = :playerId",
+            TableName: "BingoTicket"
+        };
 
-    var result = await dynamodb.scan(params).promise();
+        var result = await dynamodb.query(params).promise();
 
-    let userTicket = null;
-    if (result.Count > 0) {
-        var userCard = result.Items[0].card;
-        userTicket = { userName: result.Items[0].userName, userCard, winnerNotificationReferenceMessageId };
+        let userTicket = null;
+        if (result.Count > 0) {
+            var numbers = result.Items[0].Ticket;
+            userTicket = { userName: result.Items[0].UserName, numbers, winnerNotificationReferenceMessageId };
+        }
+        return userTicket;
+
+    } catch (error) {
+        console.error(`Error when trying to get Bingo_(${bingoExecutionName}) ticket for Player: ${playerId}: `, JSON.stringify(error));
+        throw error;
     }
-    return userTicket;
 }
 
 const tryToSaveBingoTicket = async (ticketHash, playerId, numbers, userName, bingoExecutionName) => {
-
     try {
+        console.log(`Trying to save ticket ${numbers} for Player: ${playerId} on Bingo_(${bingoExecutionName})`);
+        
         var params = {
             TableName: "BingoTicket",
             Item: {
+                BingoExecutionName: bingoExecutionName,
                 TicketHash: ticketHash,
-                playerId: playerId,
-                card: numbers,
-                userName,
-                bingoExecutionName
+                PlayerId: playerId,
+                Ticket: numbers,
+                UserName: userName,
             },
-            ConditionExpression: 'attribute_not_exists(TicketHash) AND attribute_not_exists(playerId) AND attribute_not_exists(bingoExecutionName)',
             ReturnValues: "ALL_OLD",
             ReturnItemCollectionMetrics: "SIZE"
         };
 
         await dynamodb.put(params).promise();
-    } catch (e) {
-        console.log("Error when trying to save bingo ticket: ", JSON.stringify(e));
+    } catch (error) {
+        console.error(`Error when rying to save ticket ${numbers} for Player: ${playerId} on Bingo_(${bingoExecutionName}): `, JSON.stringify(error));
         return false;
     }
     return true;
 }
 
-exports.getUserCard = getUserCard;
+exports.getUserTicket = getUserTicket;
 exports.tryToSaveBingoTicket = tryToSaveBingoTicket;
