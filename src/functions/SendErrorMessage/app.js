@@ -14,6 +14,6 @@ async function sendErrorMessage(messageContent) {
     let messageFactory = twitterMessageFactory(MessageTypes.ERROR_MESSAGE, {
         message: messageContent
     });
-    let response = await messageFactory.buildAndSend(message);
+    let response = await messageFactory.buildAndSend();
     return response.id_str;
 }
