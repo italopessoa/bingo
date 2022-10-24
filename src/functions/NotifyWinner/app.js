@@ -14,13 +14,11 @@ exports.handler = async (state) => {
 
 async function sendMessageToWinner(player) {
     var body = {
-        messageType: MessageTypes.STATUS_RESPONSE_MESSAGE,
         message: "parabens jovem voce ganhou " + new Date().toISOString(),
         inResponseToMessageId: player.winnerNotificationReferenceMessageId
     };
 
-    let messageFactory = twitterMessageFactory(body);
-    let message = await messageFactory.create();
-    let response = await messageFactory.send(message);
+    let messageFactory = twitterMessageFactory(MessageTypes.STATUS_RESPONSE_MESSAGE, body);
+    let response = await messageFactory.buildAndSend();
     return response.id_str;
 }

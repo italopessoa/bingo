@@ -204,13 +204,12 @@ const sendMessageFunctions = {
  * 
  * @returns {{create:function, send: function(message)}} factory methods to create and send twitter message
  */
-const twitterMessageFactory = (body) => {
-    var functionToCreateMessage = createMessageFunctions[body.messageType];
-    var functionToSendMessage = sendMessageFunctions[body.messageType];
+const twitterMessageFactory = (messageType, body) => {
+    var functionToCreateMessage = createMessageFunctions[messageType];
+    var functionToSendMessage = sendMessageFunctions[messageType];
 
     return {
-        create: () => functionToCreateMessage(body),
-        send: functionToSendMessage
+        buildAndSend: () => functionToSendMessage(functionToCreateMessage(body))
     }
 };
 

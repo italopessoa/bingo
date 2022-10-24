@@ -43,11 +43,10 @@ const getNumberGroup = (number) => {
 
 const postSelectedNumber = async (group, number) => {
     let body = {
-        messageType: MessageTypes.STATUS_MESSAGE_WITH_IMAGE_MEDIA,
         message: `Na letra ${group}: ${number}`,
         mediaImagesBase64: [images[group], images[number]]
     };
-    let messageFactory = twitterMessageFactory(body);
-    let message = await messageFactory.create();
-    return await messageFactory.send(message);
+    
+    let messageFactory = twitterMessageFactory(MessageTypes.STATUS_MESSAGE_WITH_IMAGE_MEDIA, body);
+    return await messageFactory.buildAndSend(message);
 }

@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { twitterMessageFactory, MessageTypes, getTwitterUserName } = require('../Services/TwitterHelperService');
 const DynamoDBService = require('../Services/DynamoDBHelperService');
-const { board, bingoNumbers } = require('../assets');
+const { board, getBingoNumbers } = require('../assets');
 
 exports.handler = async (state) => {
     const { newPlayers, executionName } = state;
@@ -18,20 +18,14 @@ exports.handler = async (state) => {
 }
 
 async function createAndSendTicketMessage(newPlayers, player, executionName) {
-    const body = {
-        messageType: MessageTypes.DIRECT_MESSAGE
-    };
-
     const playerId = newPlayers[player];
     const userName = await getTwitterUserName(playerId);
     let ticket = await generateCard(playerId, userName, executionName);
 
-    body.message = "sua cartela = " + ticket.join('-');
-    body.recipientId = playerId;
-
-    let messageFactory = twitterMessageFactory(body);
-    let message = await messageFactory.create();
-    await messageFactory.send(message);
+    await twitterMessageFactory(MessageTypes.DIRECT_MESSAGE, {
+        message: "sua cartela = " + ticket.join('-'),
+        recipientId: playerId
+    }).buildAndSend();
 }
 
 const generateCard = async (playerId, username, bingoExecutionName) => {
@@ -43,7 +37,7 @@ const generateCard = async (playerId, username, bingoExecutionName) => {
         const hash = crypto.createHash('sha256');
         hash.update(cardCopy.sort((a, b) => a - b).join('-'));
         var hashBase64 = hash.digest('base64');
-        
+
         cardCreated = await DynamoDBService.tryToSaveBingoTicket(hashBase64, playerId, cardCopy, username, bingoExecutionName);
     }
     while (!cardCreated);
@@ -53,7 +47,7 @@ const generateCard = async (playerId, username, bingoExecutionName) => {
 const generateCardNumbers = () => {
     let ticket = [];
     board.forEach((numberGroup => {
-        var ticketColumn = getTicketNumbersByGroup(bingoNumbers(), numberGroup.cardMax, numberGroup.min, numberGroup.max);
+        var ticketColumn = getTicketNumbersByGroup(getBingoNumbers(), numberGroup.cardMax, numberGroup.min, numberGroup.max);
         ticket = ticket.concat(ticketColumn);
     }));
 

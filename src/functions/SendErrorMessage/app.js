@@ -11,13 +11,9 @@ exports.handler = async (state) => {
 }
 
 async function sendErrorMessage(messageContent) {
-    var body = {
-        messageType: MessageTypes.ERROR_MESSAGE,
+    let messageFactory = twitterMessageFactory(MessageTypes.ERROR_MESSAGE, {
         message: messageContent
-    };
-
-    let messageFactory = twitterMessageFactory(body);
-    let message = await messageFactory.create();
-    let response = await messageFactory.send(message);
+    });
+    let response = await messageFactory.buildAndSend(message);
     return response.id_str;
 }

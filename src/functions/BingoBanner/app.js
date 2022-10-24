@@ -1,5 +1,5 @@
 const { twitterMessageFactory, MessageTypes } = require('../Services/TwitterHelperService');
-const { bingoNumbers } = require('../assets');
+const { getBingoNumbers } = require('../assets');
 
 /**
  *
@@ -13,17 +13,12 @@ const { bingoNumbers } = require('../assets');
 exports.handler = async (input) => {
     const { StartTime, ExecutionName: executionName } = input;
 
-    let body = {
-        messageType: MessageTypes.STATUS_MESSAGE,
+    let response = await twitterMessageFactory(MessageTypes.STATUS_MESSAGE, {
         message: `Play at: ${StartTime} - Start at:${add_minutes(new Date(StartTime), 10)}`
-    };
-
-    let messageFactory = twitterMessageFactory(body);
-    let message = await messageFactory.create();
-    let response = await messageFactory.send(message);
+    }).buildAndSend();
 
     //TODO: better solution https://javascript.info/array-methods#shuffle-an-array
-    const numbers = bingoNumbers()
+    const numbers = getBingoNumbers()
         .sort(() => 0.5 - Math.random());
 
     return {
