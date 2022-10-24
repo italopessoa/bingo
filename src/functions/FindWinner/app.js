@@ -1,13 +1,17 @@
 const TwitterService = require('../Services/TwitterHelperService');
 const DynamoDBService = require('../Services/DynamoDBHelperService');
 
-const validateWinners = (calledNumbers, userCards) => {
-    console.log("Trying to validate winners");
-    console.log("Players tickets: ", userCards);
-    var winners = userCards
-        .filter(item => item.userCard.every(ticketNumber => calledNumbers.includes(ticketNumber)))
-    return winners;
-}
+exports.handler = async (state) => {
+    let allPlayers = await getWinnerPlayersFromMessages(state);
+    var allUserCard = await getAllUserCards(allPlayers);
+    let winnersList = validateWinners(state.calledNumbers, allUserCard);
+
+    return {
+        ...state,
+        hasWinner: winnersList.length > 0,
+        winnersList
+    };
+};
 
 async function getWinnerPlayersFromMessages({ lastBallCalledDate, players }) {
     let winners = await TwitterService.searchWinners();
@@ -37,14 +41,10 @@ async function getAllUserCards(allPlayers) {
             }));
 }
 
-exports.handler = async (state) => {
-    let allPlayers = await getWinnerPlayersFromMessages(state);
-    var allUserCard = await getAllUserCards(allPlayers);
-    let winnersList = validateWinners(state.calledNumbers, allUserCard);
-
-    return {
-        ...state,
-        hasWinner: winnersList.length > 0,
-        winnersList
-    };
-};
+const validateWinners = (calledNumbers, userCards) => {
+    console.log("Trying to validate winners");
+    console.log("Players tickets: ", userCards);
+    var winners = userCards
+        .filter(item => item.userCard.every(ticketNumber => calledNumbers.includes(ticketNumber)))
+    return winners;
+}

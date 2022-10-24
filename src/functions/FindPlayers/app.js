@@ -1,8 +1,5 @@
 const TwitterService = require('../Services/TwitterHelperService');
 
-const isPlayerRegistered = (players, playerId) => players.find(id => id === playerId);
-
-const isFollowerPlayer = async (playerId) => (await TwitterService.getTargetUserRelationship(playerId)).following;
 
 /**
  *
@@ -33,3 +30,7 @@ exports.handler = async (state) => {
         invalidPlayers: [...invalidPlayers, ...notFollowers]
     }
 };
+
+const isPlayerRegistered = (players, playerId) => players.find(id => id === playerId);
+
+const isFollowerPlayer = async (playerId) => (await TwitterService.getTargetUserRelationship(playerId)).following;
