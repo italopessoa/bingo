@@ -3,7 +3,7 @@ const { board, images } = require('../assets');
 
 exports.handler = async (state) => {
     let calledNumbers = state.calledNumbers;
-    let numbers = getNonCalledNumbers(state);
+    let numbers = getNonCalledNumbers(state.numbers, calledNumbers);
     let numberGroup = getNumberAndGroup(numbers);
     var numberCall = await postSelectedNumber(numberGroup.group, numberGroup.number);
     calledNumbers.push(numberGroup.number);
@@ -19,7 +19,7 @@ exports.handler = async (state) => {
     }
 }
 
-const getNonCalledNumbers = ({ numbers, calledNumbers }) => {
+const getNonCalledNumbers = (numbers, calledNumbers) => {
     return numbers
         .filter(number => calledNumbers.indexOf(number) < 0);
 }
@@ -46,7 +46,7 @@ const postSelectedNumber = async (group, number) => {
         message: `Na letra ${group}: ${number}`,
         mediaImagesBase64: [images[group], images[number]]
     };
-    
+
     let messageFactory = twitterMessageFactory(MessageTypes.STATUS_MESSAGE_WITH_IMAGE_MEDIA, body);
-    return await messageFactory.buildAndSend(message);
+    return await messageFactory.buildAndSendAsync();
 }

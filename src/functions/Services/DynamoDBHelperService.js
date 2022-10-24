@@ -1,6 +1,6 @@
 var AWS = require("aws-sdk");
 var dynamodb = new AWS.DynamoDB.DocumentClient();
-
+//TODO check later https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb/classes/querycommand.html
 const getUserTicket = async (playerId, bingoExecutionName, winnerNotificationReferenceMessageId) => {
     try {
         console.log(`Trying to get Bingo_(${bingoExecutionName}) ticket for Player: ${playerId}`);

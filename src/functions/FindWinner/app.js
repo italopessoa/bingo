@@ -3,7 +3,7 @@ const DynamoDBService = require('../Services/DynamoDBHelperService');
 
 exports.handler = async (state) => {
     let allPlayers = await getWinnerPlayersFromMessages(state);
-    var allWinnersTickets = await getAllWinnersTickets(allPlayers);
+    var allWinnersTickets = await getAllWinnersTickets(state.executionName, allPlayers);
     let winnersList = validateWinners(state.calledNumbers, allWinnersTickets);
 
     return {
@@ -33,17 +33,17 @@ async function getWinnerPlayersFromMessages({ lastBallCalledDate, players }) {
     return allPlayers;
 }
 
-async function getAllWinnersTickets(allPlayers) {
+async function getAllWinnersTickets(executionName, allPlayers) {
     return await Promise.all(
         allPlayers
             .map(({ user_id_str, winnerNotificationReferenceMessageId }) => {
-                return DynamoDBService.getUserTicket(user_id_str, winnerNotificationReferenceMessageId);
+                return DynamoDBService.getUserTicket(user_id_str, executionName, winnerNotificationReferenceMessageId);
             }));
 }
 
 const validateWinners = (calledNumbers, playersTickets) => {
     console.log("Trying to validate winners");
-    console.log("Players tickets: ", userCards);
+    console.log("Players tickets: ", playersTickets);
     var winners = playersTickets
         .filter(ticket => ticket.numbers.every(ticketNumber => calledNumbers.includes(ticketNumber)))
     return winners;

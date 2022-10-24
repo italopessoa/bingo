@@ -2,7 +2,7 @@ const { twitterMessageFactory, MessageTypes } = require('../Services/TwitterHelp
 
 exports.handler = async (state) => {
 
-    let messageId = await sendErrorMessage("Paro paro paro, deu ruim aqui pessoal. Acontece, erros acontecem. Voltamos em breve co mais informacoes #obingonaopodeparar");
+    let messageId = await sendErrorMessage(state.executionName+" - Paro paro paro, deu ruim aqui pessoal. Acontece, erros acontecem. Voltamos em breve co mais informacoes #obingonaopodeparar");
 
     return {
         ...state,

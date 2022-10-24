@@ -133,12 +133,16 @@ const createMessageWithImageMedia = async (body) => {
     return { status: body.message, media_ids: media_ids.join(',') };
 };
 
-const sendStatusMessage = (message) => oauthPost(`${TWITTER_API_V1_1}/statuses/update.json`, {
-    ...message
-}, 'application/x-www-form-urlencoded');
+const sendStatusMessage = (message) => {
+    console.log('[sendStatusMessage]: ', message);
+
+    return oauthPost(`${TWITTER_API_V1_1}/statuses/update.json`, {
+        ...message
+    }, 'application/x-www-form-urlencoded');
+}
 
 const sendDirectMessage = (message) => {
-    console.log('[sendDirectMessage], ', message);
+    console.log('[sendDirectMessage]: ', message);
     return oauthPost(`${TWITTER_API_V1_1}/direct_messages/events/new.json`,
         JSON.stringify({
             ...message
@@ -179,10 +183,10 @@ const sendMessageFunctions = {
 
 /** 
  * @param {{
- * messageType,
  * message,
  * mediaImagesBase64,
- * recipienteId}} body paramaters to create messages depending on messageType
+ * recipienteId,
+ * inResponseToMessageId}} body paramaters to create messages depending on messageType
  * 
  * @returns {{create:function, send: function(message)}} factory methods to create and send twitter message
  */
@@ -191,7 +195,13 @@ const twitterMessageFactory = (messageType, body) => {
     var functionToSendMessage = sendMessageFunctions[messageType];
 
     return {
-        buildAndSend: () => functionToSendMessage(functionToCreateMessage(body))
+        buildAndSend: () => functionToSendMessage(functionToCreateMessage(body)),
+        /**
+         * workaround specifically for messages with media haha. hopefully will get 
+         * some better solution onde day
+         * maybe you have the solution?
+         */
+        buildAndSendAsync: async () => functionToSendMessage(await functionToCreateMessage(body))
     }
 };
 
