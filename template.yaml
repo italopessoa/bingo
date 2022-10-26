@@ -62,6 +62,32 @@ Resources:
         - SQSSendMessagePolicy:
             QueueName: !GetAtt BingoMessagesQueueFIFO.QueueName
 
+  lambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 
+      FunctionName: 
+      Handler: 
+      KmsKeyArn: 
+      MemorySize: 128
+      Role: role-arn
+      Runtime: nodejs | nodejs4.3 | nodejs6.10 | nodejs8.10 | java8 | python2.7 | python3.6 | dotnetcore1.0 | dotnetcore2.0 | dotnetcore2.1 | nodejs4.3-edge | go1.x
+      Timeout: 
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-id
+        SubnetIds:
+          - subnet-id
+      Environment:
+        Variables:
+          key1: value1 # A map of key-value pairs that the Lambda function can access
+      Code:
+        S3Bucket: 
+        S3Key: 
+        S3ObjectVersion: 
+        ZipFile: 
+
+
   PostBingoBannerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -77,9 +103,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   FindPlayersFunction:
     Type: AWS::Serverless::Function
@@ -96,9 +119,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   CreateTicketFunction:
     Type: AWS::Serverless::Function
@@ -115,9 +135,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   NumbersDrawFunction:
     Type: AWS::Serverless::Function
@@ -134,9 +151,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   FindWinnerFunction:
     Type: AWS::Serverless::Function
@@ -153,9 +167,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   NotifyWinnerFunction:
     Type: AWS::Serverless::Function
@@ -172,9 +183,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   SendErrorMessageFunction:
     Type: AWS::Serverless::Function
@@ -191,9 +199,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   DestroyMessagesFunction:
     Type: AWS::Serverless::Function
@@ -223,9 +228,6 @@ Resources:
       PackageType: Zip
       Timeout: 45
       MemorySize: 128
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   WSSOnConnectFunction:
     Type: AWS::Serverless::Function
@@ -236,9 +238,6 @@ Resources:
       PackageType: Zip
       Timeout: 45
       MemorySize: 128
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
@@ -306,7 +305,7 @@ Resources:
       Permissions:
         - Read
         - Write
-
+        
   WSSOnConnectFunctionTableConnector:
     Type: AWS::Serverless::Connector
     Properties:
