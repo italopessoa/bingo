@@ -9,6 +9,7 @@ const { getBingoNumbers } = require('../assets');
  * Return doc: 
  * @returns {Object} state - Return initial state
  * 
+ * https://www.npmjs.com/package/middy
  */
 exports.handler = async (input) => {
     const { StartTime, ExecutionName: executionName } = input;

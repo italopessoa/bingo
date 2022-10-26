@@ -4,12 +4,8 @@ const DynamoDBService = require('../Services/DynamoDBHelperService');
 const { board, getBingoNumbers } = require('../assets');
 
 exports.handler = async (state) => {
-    const { newPlayers, executionName } = state;
-
-    for (let player in newPlayers) {
-        await createAndSendTicketMessage(newPlayers, player, executionName);
-    };
-
+    await createTicketAndSendMessage(state.newPlayers, state.executionName);
+    
     return {
         ...state,
         newPlayers: [],
@@ -17,15 +13,17 @@ exports.handler = async (state) => {
     }
 }
 
-async function createAndSendTicketMessage(newPlayers, player, executionName) {
-    const playerId = newPlayers[player];
-    const userName = await getTwitterUserName(playerId);
-    let ticket = await generateTicket(playerId, userName, executionName);
+async function createTicketAndSendMessage(newPlayers, executionName) {
+    await newPlayers.forEach(async playerId => {
 
-    await twitterMessageFactory(MessageTypes.DIRECT_MESSAGE, {
-        message: "sua cartela = " + ticket.join('-'),
-        recipientId: playerId
-    }).buildAndSend();
+        const userName = await getTwitterUserName(playerId);
+        let ticket = await generateTicket(playerId, userName, executionName);
+
+        await twitterMessageFactory(MessageTypes.DIRECT_MESSAGE, {
+            message: "sua cartela = " + ticket.join('-'),
+            recipientId: playerId
+        }).buildAndSend();
+    });
 }
 
 const generateTicket = async (playerId, username, bingoExecutionName) => {
