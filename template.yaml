@@ -215,9 +215,6 @@ Resources:
           CONSUMER_SECRET: !Ref TwitterConsumerSecret
           SECRET: !Ref TwitterAppSecret
           TOKEN: !Ref TwitterAppToken
-      Tags:
-        - Key: Project
-          Value: sam-bingo-app
 
   WSSOnDisconnectFunction:
     Type: AWS::Serverless::Function
@@ -305,7 +302,7 @@ Resources:
       Permissions:
         - Read
         - Write
-        
+
   WSSOnConnectFunctionTableConnector:
     Type: AWS::Serverless::Connector
     Properties:
