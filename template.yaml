@@ -210,6 +210,16 @@ Resources:
       Timeout: 45
       MemorySize: 128
 
+  WSSOnDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/functions/BingoWSS/app.ondisconnect_handler
+      Runtime: nodejs14.x
+      PackageType: Zip
+      Timeout: 45
+      MemorySize: 128
+
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -286,3 +296,16 @@ Resources:
         Id: BingoTicketTable
       Permissions:
         - Write
+        
+  WSSOnDisconnectFunctionTableConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: WSSOnDisconnectFunction
+      Destination:
+        Id: BingoTicketTable
+      Permissions:
+        - Read
+        - Write
+
+        
