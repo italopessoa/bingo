@@ -1,4 +1,4 @@
-const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require("@aws-sdk/client-apigatewaymanagementapi");
+const AWS = require('aws-sdk');
 const { DynamoDBClient, ScanCommand, UpdateItemCommand } = require("@aws-sdk/client-apigatewaymanagementapi");
 const ddbClient = new DynamoDBClient();
 
@@ -59,15 +59,11 @@ async function getActiveConnections(bingoExecutionName) {
 }
 
 async function sendMessage(params) {
-    let apiGtwManagementApiClient = new ApiGatewayManagementApiClient({
+    const apigwManagementApi = new AWS.ApiGatewayManagementApi({
         apiVersion: '2018-11-29',
         endpoint: `${params.requestContext.domainName} / ${params.requestContext.stage}`
     });
-
-    await apiGtwManagementApiClient.send(new PostToConnectionCommand({
-        ConnectionId: params.connectionId, Data: params.messageData
-    }
-    ));
+    await apigwManagementApi.postToConnection({ ConnectionId: params.connectionId, Data: params.messageData }).promise();
 }
 
 //TODO: duplicated
