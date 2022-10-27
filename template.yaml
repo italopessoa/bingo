@@ -366,6 +366,46 @@ Resources:
         - - 'integrations'
           - !Ref SendMessageRouteIntegration
 
+  DefaultRoute:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        ApiId: !Ref BingoWebSocket
+        RouteKey: $default
+        RouteResponseSelectionExpression: '$default'
+        AuthorizationType: NONE
+        OperationName: DefaultRoute
+        Target: !Join
+          - '/'
+          - - 'integrations'
+            - !Ref DefaultIntegration
+  
+  DefaultIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref BingoWebSocket
+      Description: Default Integration
+      IntegrationType: MOCK
+      RequestTemplates: 
+        "200" : '{"statusCode" : 200}'
+      TemplateSelectionExpression: '200'
+
+  DefaultIntegrationRespponse:
+    Type: AWS::ApiGatewayV2::IntegrationResponse
+    Properties:
+      ApiId: !Ref BingoWebSocket
+      IntegrationId: !Ref DefaultIntegration
+      IntegrationResponseKey: $default
+      ResponseTemplates: 
+        "200" : '{"statusCode" : 200, "connectionId" : "$context.connectionId"}'
+      TemplateSelectionExpression: '200'
+  
+  DefaultRouteResponse:
+    Type: AWS::ApiGatewayV2::RouteResponse
+    Properties:
+      RouteId: !Ref DefaultRoute
+      ApiId: !Ref BingoWebSocket
+      RouteResponseKey: $default
+
   ConnectionRouteIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
