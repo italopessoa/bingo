@@ -1,5 +1,6 @@
-const { DynamoDBClient, UpdateItemCommand, ScanCommandInpt, ScanCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, UpdateItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
 const TABLE_NAME = "BingoTicket";
+let client = new DynamoDBClient();
 
 async function onConnect({ queryStringParameters, requestContext: { connectionId } }) {
     let { executionName, playerId } = queryStringParameters;
@@ -21,13 +22,13 @@ async function onConnect({ queryStringParameters, requestContext: { connectionId
     }
 }
 
-async function onDisconnect(event) {
-    console.log(event);
-    const { requestContext: { connectionId } } = event;
+async function onDisconnect({ requestContext: { connectionId } }) {
     try {
         var player = await getPlayerByConnectionId(connectionId);
-        console.log(`Trying to diconnect player: ${player.UserName} from Execution: ${player.BingoExecutionName}`);
-        let command = buildUpdateCommand(player.BingoExecutionName, player.PlayerId, player.ConnectionId);
+
+        console.log(`Trying to diconnect player: ${player.UserName} from Execution: ${player.BingoExecutionName}, ConnectionId: ${connectionId}`);
+        let command = buildUpdateCommand(player.BingoExecutionName, player.PlayerId, '');
+
         await updateConnectionId(command);
         return {
             statusCode: 200
@@ -59,9 +60,7 @@ function buildUpdateCommand(executionName, playerId, connectionId) {
 
 async function updateConnectionId(command) {
     try {
-        let client = new DynamoDBClient();
         await client.send(command);
-
         console.log("Player connection updated");
     } catch (error) {
         console.error("Error when trying to update player connection: ", error);
@@ -70,29 +69,43 @@ async function updateConnectionId(command) {
 }
 
 async function getPlayerByConnectionId(connectionId) {
+    var output = {};
+
     try {
-        var command = buildScanPlayerCommand(connectionId);
-        let client = new DynamoDBClient();
-        let response = await client.send(command);
-        return response.Count > 0 ? response.Items[0] : null;
+        output = await client.send(buildScanPlayerCommand(connectionId));
     } catch (error) {
         console.error("Error when trying to get player by ConnectionId: ", connectionId);
         console.error(error);
         throw error;
     }
+
+    if (output.Count > 0) {
+        return mapDynamoDBPlayerItemToJson(output.Items[0])
+    } else {
+        console.log("Player not found");
+    }
+    return {};
 }
 
 function buildScanPlayerCommand(connectionId) {
     return new ScanCommand({
         TableName: TABLE_NAME,
-        AttributesToGet: "BingoExecutionName, PlayerId, ConnectionId",
-        ProjectionExpression: "BingoExecutionName, PlayerId, ConnectionId",
+        ProjectionExpression: "BingoExecutionName, PlayerId, ConnectionId, UserName",
         Limit: 1,
         FilterExpression: "ConnectionId = :connectionId",
         ExpressionAttributeValues: {
             ":connectionId": { S: connectionId }
         }
     });
+}
+
+function mapDynamoDBPlayerItemToJson(item) {
+    return {
+        PlayerId: item.PlayerId.S,
+        BingoExecutionName: item.BingoExecutionName.S,
+        ConnectionId: item.ConnectionId.S,
+        UserName: item.UserName.S
+    }
 }
 
 exports.ondisconnect_handler = onDisconnect;

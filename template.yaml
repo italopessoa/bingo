@@ -197,7 +197,7 @@ Resources:
       Handler: src/functions/BingoWSS/app.ondisconnect_handler
       Runtime: nodejs14.x
       PackageType: Zip
-      Timeout: 45
+      Timeout: 10
       MemorySize: 128
 
   WSSOnConnectFunction:
@@ -207,17 +207,7 @@ Resources:
       Handler: src/functions/BingoWSS/app.onconnect_handler
       Runtime: nodejs14.x
       PackageType: Zip
-      Timeout: 45
-      MemorySize: 128
-
-  WSSOnDisconnectFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: .
-      Handler: src/functions/BingoWSS/app.ondisconnect_handler
-      Runtime: nodejs14.x
-      PackageType: Zip
-      Timeout: 45
+      Timeout: 10
       MemorySize: 128
 
   BingoTicketTable:
@@ -296,7 +286,7 @@ Resources:
         Id: BingoTicketTable
       Permissions:
         - Write
-        
+
   WSSOnDisconnectFunctionTableConnector:
     Type: AWS::Serverless::Connector
     Properties:
@@ -308,4 +298,45 @@ Resources:
         - Read
         - Write
 
-        
+# https://gist.github.com/maatthc/9d2dfe0448733f0ee1624d658fbac80f
+# https://github.com/aws-samples/simple-websockets-chat-app/blob/master/template.yaml
+  BingoWebSocket:
+    Type:  AWS::ApiGatewayV2::Api
+    Properties:
+      Name: BingoWebSocket
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.message"
+      Description: "Bingo web socket for players communication."
+  
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref BingoWebSocket
+      RouteKey: $connect
+      RouteResponseSelectionExpression: $default
+      AuthorizationType: NONE
+      ApiKeyRequired: false
+      OperationName: ConnectRoute
+      Target:
+        - '/'
+        - - 'integrations'
+          - !Ref ConnectionRouteIntegration
+
+  ConnectionRouteIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiInfo: !Ref BingoWebSocket
+      Description: Connect route integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri:
+        Fn::Sub:
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WSSOnConnectFunction.Arn}/invocations
+
+  WSSOnConnectFunctionPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - BingoWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref WSSOnConnectFunction
+      Principal: apigateway.amazon.com

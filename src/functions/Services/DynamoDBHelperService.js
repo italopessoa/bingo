@@ -10,7 +10,7 @@ const getUserTicket = async (playerId, bingoExecutionName, winnerNotificationRef
                 ":bingoExecutionName": bingoExecutionName,
                 ":playerId": playerId
             },
-            KilterExpression: "BingoExecutionName = :bingoExecutionName AND PlayerId = :playerId",
+            FilterExpression: "BingoExecutionName = :bingoExecutionName AND PlayerId = :playerId",
             TableName: "BingoTicket"
         };
 
