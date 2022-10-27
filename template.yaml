@@ -317,7 +317,7 @@ Resources:
       AuthorizationType: NONE
       ApiKeyRequired: false
       OperationName: ConnectRoute
-      Target:
+      Target: !Join
         - '/'
         - - 'integrations'
           - !Ref ConnectionRouteIntegration
@@ -339,4 +339,4 @@ Resources:
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref WSSOnConnectFunction
-      Principal: apigateway.amazon.com
+      Principal: apigateway.amazonaws.com
