@@ -382,10 +382,9 @@ Resources:
       ApiId: !Ref BingoWebSocket
 
   Stage:
-    Type: AWS::ApigatewayV2::Stage
+    Type: AWS::ApiGatewayV2::Stage
     Properties:
       StageName: dev
       Description: Development stage
       DeploymentId: !Ref Deployment
       ApiId: !Ref BingoWebSocket
-      
