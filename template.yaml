@@ -224,7 +224,7 @@ Resources:
           - Effect: Allow
             Action:
               - 'execute-api:ManageConnections'
-            Resources:
+            Resource:
               - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${BingoWebSocket}/*'
 
   BingoTicketTable:
