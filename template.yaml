@@ -63,7 +63,7 @@ Resources:
         - SQSSendMessagePolicy:
             QueueName: !GetAtt BingoMessagesQueueFIFO.QueueName
         - SNSPublishMessagePolicy:
-            TopicName: !Get BingoWebSocketNotification.TopicName
+            TopicName: !GetAtt BingoWebSocketNotification.TopicName
 
   PostBingoBannerFunction:
     Type: AWS::Serverless::Function
