@@ -239,7 +239,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref BingoTicketTable
-          WEBSOCKET_DOMAN: !GetAtt BingoWebSocket.DomainName.RegionalDomainName
+          WEBSOCKET_DOMAN: !Ref BingoWebSocket.DomainName
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
