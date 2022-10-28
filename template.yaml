@@ -509,7 +509,7 @@ Resources:
       StageName: dev
       Description: Development stage
       DeploymentId: !Ref Deployment
-    ApiId: !Ref BingoWebSocket
+      ApiId: !Ref BingoWebSocket
 
 Outputs:
   WebSocketURI:
