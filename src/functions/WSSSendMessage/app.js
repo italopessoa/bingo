@@ -1,17 +1,15 @@
 const AWS = require('aws-sdk');
 const { DynamoDBClient, ScanCommand, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
 const ddbClient = new DynamoDBClient();
-const TABLE_NAME = "BingoTicket";
-
 const STAGE = 'dev';
-const DOMAIN_NAME = 'y9hit3fxl7.execute-api.sa-east-1.amazonaws.com';
 
 exports.handler = async (event) => {
-    console.log(event);
+    let snsMessage = JSON.parse(event.Records[0].Sns.Message).data;
+    console.log(snsMessage);
     let connections = [];
 
     try {
-        connections = await getActiveConnections(event.bingoExecutionName);
+        connections = await getActiveConnections(snsMessage.bingoExecutionName);
     } catch (error) {
         console.error("Error when trying to get active connections: ", error);
         return { statusCode: 500, body: 'Error when trying to get active connections' };
@@ -20,7 +18,7 @@ exports.handler = async (event) => {
     let postCalls = connections.map(async ({ BingoExecutionName, PlayerId, ConnectionId, UserName }) => {
         try {
             await sendMessage({
-                messageData: JSON.stringify(event.message),
+                messageData: JSON.stringify(snsMessage),
                 connectionId: ConnectionId
             });
         } catch (error) {
@@ -47,19 +45,20 @@ exports.handler = async (event) => {
 async function getActiveConnections(bingoExecutionName) {
     try {
         let command = new ScanCommand({
-            TableName: TABLE_NAME,
+            TableName: process.env.TABLE_NAME,
             ProjectionExpression: "BingoExecutionName, PlayerId, ConnectionId, UserName",
             FilterExpression: "BingoExecutionName = :bingoExecutionName",
             ExpressionAttributeValues: {
                 ":bingoExecutionName": { S: bingoExecutionName }
             }
         });
+        
         let result = await ddbClient.send(command);
         return result.Items.map(item => ({
-            [item.BingoExecutionName]: item.BingoExecutionName.S,
-            [item.ConnectionId]: item.ConnectionId.S,
-            [item.PlayerId]: item.PlayerId.S,
-            [item.UserName]: item.UserName.S
+            BingoExecutionName: item.BingoExecutionName.S,
+            ConnectionId: item.ConnectionId.S,
+            PlayerId: item.PlayerId.S,
+            UserName: item.UserName.S
         }));
     } catch (error) {
         console.error("Error when trying to get active connections: ", error);
@@ -70,7 +69,7 @@ async function getActiveConnections(bingoExecutionName) {
 async function sendMessage(params) {
     const apigwManagementApi = new AWS.ApiGatewayManagementApi({
         apiVersion: '2018-11-29',
-        endpoint: `${DOMAIN_NAME}/${STAGE}`
+        endpoint: `${process.env.WEBSOCKET_DOMAN}/${STAGE}`
     });
     await apigwManagementApi.postToConnection({ ConnectionId: params.connectionId, Data: params.messageData }).promise();
 }
@@ -78,7 +77,7 @@ async function sendMessage(params) {
 //TODO: duplicated
 function buildUpdateCommand(executionName, playerId, connectionId) {
     return new UpdateItemCommand({
-        TableName: TABLE_NAME,
+        TableName: process.env.TABLE_NAME,
         Key: {
             BingoExecutionName: { S: executionName },
             PlayerId: { S: playerId }

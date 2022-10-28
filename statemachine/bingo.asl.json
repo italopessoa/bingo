@@ -188,8 +188,8 @@
                   "Message": {
                     "type": "NUMBERS_UPDATE",
                     "data": {
-                      "executionName": "$.input.executionName",
-                      "numbers": "$.input.calledNumbers"
+                      "bingoExecutionName": "$.executionName",
+                      "numbers": "$.calledNumbers"
                     }
                   }
                 },
@@ -199,7 +199,7 @@
             }
           }
         ],
-        "OutputPath": null
+        "ResultPath": null
       },
       "Any number available?": {
         "Type": "Choice",

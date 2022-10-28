@@ -234,6 +234,10 @@ Resources:
           Type: SNS
           Properties:
             Topic: !Ref BingoWebSocketNotification
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref BingoTicketTable.TableName
+          WEBSOCKET_DOMAN: !GetAtt BingoWebSocket.RegionalDomainName
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table

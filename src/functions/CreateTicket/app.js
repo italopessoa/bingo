@@ -4,8 +4,7 @@ const DynamoDBService = require('../Services/DynamoDBHelperService');
 const { board, getBingoNumbers } = require('../assets');
 
 exports.handler = async (state) => {
-    await createTicketAndSendMessage(state.newPlayers, state.executionName);
-    
+    await createAndSendTicketMessage(state.newPlayers, state.executionName);
     return {
         ...state,
         newPlayers: [],
@@ -13,9 +12,9 @@ exports.handler = async (state) => {
     }
 }
 
-async function createTicketAndSendMessage(newPlayers, executionName) {
-    await newPlayers.forEach(async playerId => {
-
+async function createAndSendTicketMessage(newPlayers, executionName) {
+    for (let player in newPlayers) {
+        const playerId = newPlayers[player];
         const userName = await getTwitterUserName(playerId);
         let ticket = await generateTicket(playerId, userName, executionName);
 
@@ -23,11 +22,10 @@ async function createTicketAndSendMessage(newPlayers, executionName) {
             message: "sua cartela = " + ticket.join('-'),
             recipientId: playerId
         }).buildAndSend();
-    });
+    };
 }
 
 const generateTicket = async (playerId, username, bingoExecutionName) => {
-
     let userCard = generateTicketNumbers();
     let cardCreated = false;
     do {
@@ -35,7 +33,6 @@ const generateTicket = async (playerId, username, bingoExecutionName) => {
         const hash = crypto.createHash('sha256');
         hash.update(cardCopy.sort((a, b) => a - b).join('-'));
         var hashBase64 = hash.digest('base64');
-
         cardCreated = await DynamoDBService.tryToSaveBingoTicket(hashBase64, playerId, cardCopy, username, bingoExecutionName);
     }
     while (!cardCreated);
@@ -48,7 +45,6 @@ const generateTicketNumbers = () => {
         var ticketColumn = getTicketNumbersByGroup(getBingoNumbers(), numberGroup.cardMax, numberGroup.min, numberGroup.max);
         ticket = ticket.concat(ticketColumn);
     }));
-
     return ticket;
 }
 
@@ -67,16 +63,13 @@ const fillByOrder = (numbers, size, min, max) => {
         .filter(number => {
             return number >= min && number <= max;
         });
-
     let cardColumn = [];
     for (let index = 0; index < size; index++) {
         columnNumbersRange.sort(() => 0.5 - Math.random());
         cardColumn.push(columnNumbersRange.pop());
     }
-
     return cardColumn;
 }
-
 const fillRandom = (size, min, max) => {
     let list = [];
     do {
