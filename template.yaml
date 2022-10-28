@@ -315,6 +315,17 @@ Resources:
         - Read
         - Write
 
+  WSSSendMessageFunctionTableConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: WSSSendMessageFunction
+      Destination:
+        Id: BingoTicketTable
+      Permissions:
+        - Read
+        - Write
+
 # https://gist.github.com/maatthc/9d2dfe0448733f0ee1624d658fbac80f
 # https://github.com/aws-samples/simple-websockets-chat-app/blob/master/template.yaml
   BingoWebSocket:
