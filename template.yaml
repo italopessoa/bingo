@@ -42,7 +42,7 @@ Resources:
         DestroyMessagesFunctionArn: !GetAtt DestroyMessagesFunction.Arn
         SendErrorMessageFunctionArn: !GetAtt SendErrorMessageFunction.Arn
         BingoMessagesQueueFIFOUrl: !Ref BingoMessagesQueueFIFO
-        BingoWebSocketNotificationArn: !GetAtt BingoWebSocketNotification.Arn
+        BingoWebSocketNotificationArn: !Ref BingoWebSocketNotification
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
             FunctionName: !Ref PostBingoBannerFunction
@@ -233,7 +233,7 @@ Resources:
         SNSEvent:
           Type: SNS
           Properties:
-            Topic: !GetAtt BingoWebSocketNotification.Arn
+            Topic: !Ref BingoWebSocketNotification
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
