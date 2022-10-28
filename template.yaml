@@ -236,7 +236,7 @@ Resources:
             Topic: !Ref BingoWebSocketNotification
       Environment:
         Variables:
-          TABLE_NAME: !Ref BingoTicketTable.TableName
+          TABLE_NAME: !Ref BingoTicketTable
           WEBSOCKET_DOMAN: !GetAtt BingoWebSocket.RegionalDomainName
 
   BingoTicketTable:
