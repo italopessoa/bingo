@@ -232,8 +232,8 @@ Resources:
       Events:
         SNSEvent:
           Type: SNS
-            Properties:
-              Topic: !GetAtt BingoWebSocketNotification.Arn
+          Properties:
+            Topic: !GetAtt BingoWebSocketNotification.Arn
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
