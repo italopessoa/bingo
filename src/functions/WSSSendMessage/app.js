@@ -3,6 +3,9 @@ const { DynamoDBClient, ScanCommand, UpdateItemCommand } = require("@aws-sdk/cli
 const ddbClient = new DynamoDBClient();
 const TABLE_NAME = "BingoTicket";
 
+const STAGE = 'dev';
+const DOMAIN_NAME = 'y9hit3fxl7.execute-api.sa-east-1.amazonaws.com';
+
 exports.handler = async (event) => {
     console.log(event);
     let connections = [];
@@ -17,9 +20,7 @@ exports.handler = async (event) => {
     let postCalls = connections.map(async ({ BingoExecutionName, PlayerId, ConnectionId, UserName }) => {
         try {
             await sendMessage({
-                stage: 'dev',
-                domainName: 'y9hit3fxl7.execute-api.sa-east-1.amazonaws.com',
-                messageData: event.message,
+                messageData: JSON.stringify(event.message),
                 connectionId: ConnectionId
             });
         } catch (error) {
@@ -36,6 +37,7 @@ exports.handler = async (event) => {
     try {
         await Promise.all(postCalls);
     } catch (error) {
+        console.error("Error when sending messages: ", error);
         return { statusCode: 500, body: "Error when sending messages" };
     }
 
@@ -52,7 +54,13 @@ async function getActiveConnections(bingoExecutionName) {
                 ":bingoExecutionName": { S: bingoExecutionName }
             }
         });
-        return (await ddbClient.send(command)).Items;
+        let result = await ddbClient.send(command);
+        return result.Items.map(item => ({
+            [item.BingoExecutionName]: item.BingoExecutionName.S,
+            [item.ConnectionId]: item.ConnectionId.S,
+            [item.PlayerId]: item.PlayerId.S,
+            [item.UserName]: item.UserName.S
+        }));
     } catch (error) {
         console.error("Error when trying to get active connections: ", error);
         throw error;
@@ -62,7 +70,7 @@ async function getActiveConnections(bingoExecutionName) {
 async function sendMessage(params) {
     const apigwManagementApi = new AWS.ApiGatewayManagementApi({
         apiVersion: '2018-11-29',
-        endpoint: `${params.domainName} / ${params.stage}`
+        endpoint: `${DOMAIN_NAME}/${STAGE}`
     });
     await apigwManagementApi.postToConnection({ ConnectionId: params.connectionId, Data: params.messageData }).promise();
 }

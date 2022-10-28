@@ -148,7 +148,7 @@
             "BackoffRate": 2
           }
         ],
-        "Next": "Wait for player to check their tickets",
+        "Next": "Process called number in Parallel",
         "OutputPath": "$.state",
         "ResultSelector": {
           "state.$": "$.Payload"
@@ -163,6 +163,44 @@
           }
         ]
       },
+      "Process called number in Parallel": {
+        "Type": "Parallel",
+        "Next": "Try to find a winner",
+        "Branches": [
+          {
+            "StartAt": "Wait for player to check their tickets",
+            "States": {
+              "Wait for player to check their tickets": {
+                "Type": "Wait",
+                "Seconds": 15,
+                "End": true
+              }
+            }
+          },
+          {
+            "StartAt": "SNS Publish",
+            "States": {
+              "SNS Publish": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::sns:publish",
+                "Parameters": {
+                  "TopicArn": "${BingoWebSocketNotificationArn}",
+                  "Message": {
+                    "type": "NUMBERS_UPDATE",
+                    "data": {
+                      "executionName": "$.input.executionName",
+                      "numbers": "$.input.calledNumbers"
+                    }
+                  }
+                },
+                "End": true,
+                "Comment": "Send update numbers to websocket lambda"
+              }
+            }
+          }
+        ],
+        "OutputPath": null
+      },
       "Any number available?": {
         "Type": "Choice",
         "Choices": [
@@ -173,11 +211,6 @@
           }
         ],
         "Default": "Draw a number"
-      },
-      "Wait for player to check their tickets": {
-        "Type": "Wait",
-        "Seconds": 15,
-        "Next": "Try to find a winner"
       },
       "Try to find a winner": {
         "Type": "Task",

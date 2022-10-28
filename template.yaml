@@ -42,6 +42,7 @@ Resources:
         DestroyMessagesFunctionArn: !GetAtt DestroyMessagesFunction.Arn
         SendErrorMessageFunctionArn: !GetAtt SendErrorMessageFunction.Arn
         BingoMessagesQueueFIFOUrl: !Ref BingoMessagesQueueFIFO
+        BingoWebSocketNotificationArn: !GetAtt BingoWebSocketNotification.Arn
       Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - LambdaInvokePolicy:
             FunctionName: !Ref PostBingoBannerFunction
@@ -61,6 +62,8 @@ Resources:
             FunctionName: !Ref SendErrorMessageFunction
         - SQSSendMessagePolicy:
             QueueName: !GetAtt BingoMessagesQueueFIFO.QueueName
+        - SNSPublishMessagePolicy:
+            TopicName: !Get BingoWebSocketNotification.TopicName
 
   PostBingoBannerFunction:
     Type: AWS::Serverless::Function
@@ -226,6 +229,11 @@ Resources:
               - 'execute-api:ManageConnections'
             Resource:
               - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${BingoWebSocket}/*'
+      Events:
+        SNSEvent:
+          Type: SNS
+            Properties:
+              Topic: !GetAtt BingoWebSocketNotification.Arn
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
@@ -261,6 +269,13 @@ Resources:
       Tags:
         - Key: project
           Value: sam-bingo-app
+
+  BingoWebSocketNotification:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: BingoWebSocketNotification
+      Subscription: 
+      TopicName: BingoWebSocketNotification
 
   CreateTicketTableConnector:
     Type: AWS::Serverless::Connector
