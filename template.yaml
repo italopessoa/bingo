@@ -217,6 +217,7 @@ Resources:
     Type: AWS::Serverless::Function
     DependsOn:
       - BingoWebSocket
+      - Stage
     Properties:
       CodeUri: .
       Handler: src/functions/WSSSendMessage/app.handler
@@ -239,7 +240,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref BingoTicketTable
-          WEBSOCKET_DOMAN: !Ref BingoWebSocket.DomainName
+          WEBSOCKET_DOMAN: !Join [ '', [ 'wss://', !Ref BingoWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
@@ -508,4 +509,9 @@ Resources:
       StageName: dev
       Description: Development stage
       DeploymentId: !Ref Deployment
-      ApiId: !Ref BingoWebSocket
+    ApiId: !Ref BingoWebSocket
+
+Outputs:
+  WebSocketURI:
+    Description: "The WSS Protocol URI to connect to"
+    Value: !Join [ '', [ 'wss://', !Ref BingoWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
