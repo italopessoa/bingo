@@ -113,7 +113,12 @@ const createDirectMessage = (body) => {
                     recipient_id: `${body.recipientId}`
                 },
                 message_data: {
-                    text: body.message
+                    text: body.message,
+                    ctas: body.urls.map(url => ({
+                        "type": "web_url",
+                        "label": url.label,
+                        "url": encodeURI(url.link)
+                    }))
                 }
             }
         }
@@ -142,7 +147,7 @@ const sendStatusMessage = (message) => {
 }
 
 const sendDirectMessage = (message) => {
-    console.log('[sendDirectMessage]: ', message);
+    console.log('[sendDirectMessage]: ', JSON.stringify(message));
     return oauthPost(`${TWITTER_API_V1_1}/direct_messages/events/new.json`,
         JSON.stringify({
             ...message

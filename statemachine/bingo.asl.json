@@ -178,9 +178,9 @@
             }
           },
           {
-            "StartAt": "SNS Publish",
+            "StartAt": "Publish called number",
             "States": {
-              "SNS Publish": {
+              "Publish called number": {
                 "Type": "Task",
                 "Resource": "arn:aws:states:::sns:publish",
                 "Parameters": {
@@ -188,8 +188,8 @@
                   "Message": {
                     "type": "NUMBERS_UPDATE",
                     "data": {
-                      "bingoExecutionName": "$.executionName",
-                      "numbers": "$.calledNumbers"
+                      "bingoExecutionName.$": "$.executionName",
+                      "numbers.$": "$.calledNumbers"
                     }
                   }
                 },

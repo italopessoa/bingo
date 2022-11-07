@@ -19,8 +19,14 @@ async function createAndSendTicketMessage(newPlayers, executionName) {
         let ticket = await generateTicket(playerId, userName, executionName);
 
         await twitterMessageFactory(MessageTypes.DIRECT_MESSAGE, {
-            message: "sua cartela = " + ticket.join('-'),
-            recipientId: playerId
+            message: "Sua cartela está pronta",
+            recipientId: playerId,
+            urls: [
+                {
+                    label: "Clique aqui para acessar e boa sorte!",
+                    link: `http://g1.globo.com/execute/${executionName}/player/${playerId}/ticket/${JSON.stringify(ticket)}`
+                }
+            ]
         }).buildAndSend();
     };
 }

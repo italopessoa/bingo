@@ -3,8 +3,32 @@ const { DynamoDBClient, ScanCommand, UpdateItemCommand } = require("@aws-sdk/cli
 const ddbClient = new DynamoDBClient();
 const STAGE = 'dev';
 
+const getMessagePayload = (event) => {
+    if (event.Records) {
+        return JSON.parse(event.Records[0].Sns.Message).data;
+    } else {
+        var jsonData = JSON.parse(event.body);
+        return {
+            ...jsonData.data
+        }
+        //body: '{\n"action": "sendMessage",\n"data":"teste"\n}'
+    }
+}
+/*messageType: 
+[
+    USER_CONNECTED list all users and send message to all users connected, 
+    USER_DISCONNECTED send single user to all users connected, 
+    WINNER send single user to all users connected, 
+    READY_TO_WIN send single user to all users connected, 
+    NUMBERS_UPDATE send numbers to all users connected
+]
+
+*/
+//send numbers
+//send users status
 exports.handler = async (event) => {
-    let snsMessage = JSON.parse(event.Records[0].Sns.Message).data;
+    console.log(event);
+    let snsMessage = getMessagePayload(event);
     console.log(snsMessage);
     let connections = [];
 
@@ -52,7 +76,7 @@ async function getActiveConnections(bingoExecutionName) {
                 ":bingoExecutionName": { S: bingoExecutionName }
             }
         });
-        
+
         let result = await ddbClient.send(command);
         return result.Items.map(item => ({
             BingoExecutionName: item.BingoExecutionName.S,

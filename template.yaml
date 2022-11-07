@@ -202,6 +202,10 @@ Resources:
       PackageType: Zip
       Timeout: 10
       MemorySize: 128
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref BingoTicketTable
+          TOPIC_ARN: !Ref BingoWebSocketNotification
 
   WSSOnConnectFunction:
     Type: AWS::Serverless::Function
@@ -212,6 +216,11 @@ Resources:
       PackageType: Zip
       Timeout: 10
       MemorySize: 128
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref BingoTicketTable
+          TOPIC_ARN: !Ref BingoWebSocketNotification
+
 
   WSSSendMessageFunction:
     Type: AWS::Serverless::Function
@@ -240,7 +249,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref BingoTicketTable
-          WEBSOCKET_DOMAN: !Join [ '', [ 'wss://', !Ref BingoWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+          WEBSOCKET_DOMAN: !Join [ '', [ !Ref BingoWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/'] ]
 
   BingoTicketTable:
     Type: AWS::DynamoDB::Table
@@ -325,17 +334,6 @@ Resources:
       Permissions:
         - Write
 
-  WSSOnDisconnectFunctionTableConnector:
-    Type: AWS::Serverless::Connector
-    Properties:
-      Source:
-        Id: WSSOnDisconnectFunction
-      Destination:
-        Id: BingoTicketTable
-      Permissions:
-        - Read
-        - Write
-
   WSSSendMessageFunctionTableConnector:
     Type: AWS::Serverless::Connector
     Properties:
@@ -345,6 +343,26 @@ Resources:
         Id: BingoTicketTable
       Permissions:
         - Read
+        - Write
+
+  WSSOnDisconnectFunctionSNSConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: WSSOnDisconnectFunction
+      Destination:
+        Id: BingoWebSocketNotification
+      Permissions:
+        - Write
+
+  WSSOnConnectFunctionSNSConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: WSSOnConnectFunction
+      Destination:
+        Id: BingoWebSocketNotification
+      Permissions:
         - Write
 
 # https://gist.github.com/maatthc/9d2dfe0448733f0ee1624d658fbac80f
