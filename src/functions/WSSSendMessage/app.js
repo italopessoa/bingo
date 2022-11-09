@@ -27,7 +27,7 @@ const getMessagePayload = (event) => {
 //send numbers
 //send users status
 exports.handler = async (event) => {
-    console.log(event);
+    console.log(JSON.stringify(event));
     let snsMessage = getMessagePayload(event);
     console.log(snsMessage);
     let connections = [];

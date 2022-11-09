@@ -10,7 +10,14 @@ async function onConnect({ queryStringParameters, requestContext: { connectionId
         let command = buildUpdateCommand(executionName, playerId, connectionId);
         await updateConnectionId(command);
 
-        await notifyBingo({ messageType: 'USER_CONNECTED', playerId, playerName });
+        await notifyBingo(JSON.stringify({
+            data: {
+                bingoExecutionName: executionName,
+                messageType: 'USER_CONNECTED',
+                playerId,
+                playerName
+            }
+        }));
 
         return {
             statusCode: 200
@@ -35,13 +42,19 @@ async function onDisconnect({ requestContext: { connectionId } }) {
 
         await updateConnectionId(command);
 
-        await notifyBingo({ messageType: 'USER_DISCONNECTED', playerId: player.PlayerId });
+        await notifyBingo(JSON.stringify({
+            data: {
+                bingoExecutionName: player.BingoExecutionName,
+                messageType: 'USER_DISCONNECTED',
+                playerId: player.PlayerId
+            }
+        }));
 
         return {
             statusCode: 200
         }
     } catch (error) {
-        console.error("Error on disconnectind: ", error);
+        console.error("Error on disconnecting: ", error);
         return {
             statusCode: 500,
             body: {
@@ -116,7 +129,7 @@ function mapDynamoDBPlayerItemToJson(item) {
 }
 
 async function notifyBingo(message) {
-    await AWS.SNS({ apiVersion: '2010-03-31' })
+    await new AWS.SNS({ apiVersion: '2010-03-31' })
         .publish({
             Message: message,
             TopicArn: process.env.TOPIC_ARN
