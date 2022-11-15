@@ -71,9 +71,10 @@ async function getActiveConnections(bingoExecutionName) {
         let command = new ScanCommand({
             TableName: process.env.TABLE_NAME,
             ProjectionExpression: "BingoExecutionName, PlayerId, ConnectionId, UserName",
-            FilterExpression: "BingoExecutionName = :bingoExecutionName",
+            FilterExpression: "BingoExecutionName = :bingoExecutionName AND ConnectionId <> :connectionId",
             ExpressionAttributeValues: {
-                ":bingoExecutionName": { S: bingoExecutionName }
+                ":bingoExecutionName": { S: bingoExecutionName },
+                ":connectionId": { S: "disconnected" }
             }
         });
 

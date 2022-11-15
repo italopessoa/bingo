@@ -10,14 +10,15 @@ async function onConnect({ queryStringParameters, requestContext: { connectionId
         let command = buildUpdateCommand(executionName, playerId, connectionId);
         await updateConnectionId(command);
 
-        await notifyBingo(JSON.stringify({
+        await notifyBingo({
             data: {
                 bingoExecutionName: executionName,
                 messageType: 'USER_CONNECTED',
                 playerId,
-                playerName
+                playerName,
+                connectionId
             }
-        }));
+        });
 
         return {
             statusCode: 200
@@ -38,17 +39,18 @@ async function onDisconnect({ requestContext: { connectionId } }) {
         var player = await getPlayerByConnectionId(connectionId);
 
         console.log(`Trying to diconnect player: ${player.UserName} from Execution: ${player.BingoExecutionName}, ConnectionId: ${connectionId}`);
-        let command = buildUpdateCommand(player.BingoExecutionName, player.PlayerId, '');
+        let command = buildUpdateCommand(player.BingoExecutionName, player.PlayerId, 'disconnected');
 
         await updateConnectionId(command);
 
-        await notifyBingo(JSON.stringify({
+        await notifyBingo({
             data: {
                 bingoExecutionName: player.BingoExecutionName,
                 messageType: 'USER_DISCONNECTED',
-                playerId: player.PlayerId
+                playerId: player.PlayerId,
+                connectionId
             }
-        }));
+        });
 
         return {
             statusCode: 200
@@ -111,7 +113,6 @@ function buildScanPlayerCommand(connectionId) {
     return new ScanCommand({
         TableName: process.env.TABLE_NAME,
         ProjectionExpression: "BingoExecutionName, PlayerId, ConnectionId, UserName",
-        Limit: 1,
         FilterExpression: "ConnectionId = :connectionId",
         ExpressionAttributeValues: {
             ":connectionId": { S: connectionId }
@@ -131,7 +132,7 @@ function mapDynamoDBPlayerItemToJson(item) {
 async function notifyBingo(message) {
     await new AWS.SNS({ apiVersion: '2010-03-31' })
         .publish({
-            Message: message,
+            Message: JSON.stringify(message),
             TopicArn: process.env.TOPIC_ARN
         })
         .promise();
