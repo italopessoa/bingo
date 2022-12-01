@@ -5,17 +5,17 @@ exports.handler = async (state) => {
     let calledNumbers = state.calledNumbers;
     let numbers = getNonCalledNumbers(state.numbers, calledNumbers);
     let numberGroup = getNumberAndGroup(numbers);
-    var numberCall = await postSelectedNumber(numberGroup.group, numberGroup.number);
+    // var numberCall = await postSelectedNumber(numberGroup.group, numberGroup.number);
     calledNumbers.push(numberGroup.number);
     const updatedNumbers = getNonCalledNumbers(state.numbers, calledNumbers);
 
     return {
         ...state,
-        lastBallCalledDate: new Date(numberCall.created_at).toISOString(),
+        lastBallCalledDate: new Date(/*numberCall.created_at*/).toISOString(),
         calledNumbers,
         numbers: updatedNumbers,
         numbersCount: updatedNumbers.length,
-        publishedMessages: [...state.publishedMessages, numberCall.id_str]
+        publishedMessages: [...state.publishedMessages/*, numberCall.id_str*/]
     }
 }
 

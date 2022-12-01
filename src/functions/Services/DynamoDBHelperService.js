@@ -41,6 +41,7 @@ const tryToSaveBingoTicket = async (ticketHash, playerId, numbers, userName, bin
                 PlayerId: playerId,
                 Ticket: numbers,
                 UserName: userName,
+                ConnectionId: "disconnected"
             },
             ReturnValues: "ALL_OLD",
             ReturnItemCollectionMetrics: "SIZE"

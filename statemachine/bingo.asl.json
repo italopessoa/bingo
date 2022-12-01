@@ -186,8 +186,8 @@
                 "Parameters": {
                   "TopicArn": "${BingoWebSocketNotificationArn}",
                   "Message": {
-                    "type": "NUMBERS_UPDATE",
                     "data": {
+                      "type": "NUMBERS_UPDATE",
                       "bingoExecutionName.$": "$.executionName",
                       "numbers.$": "$.calledNumbers"
                     }

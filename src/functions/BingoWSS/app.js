@@ -1,5 +1,6 @@
 var AWS = require('aws-sdk')
-const { DynamoDBClient, UpdateItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, ScanCommand } = require("@aws-sdk/client-dynamodb");
+const { buildUpdateBingoTicketCommand } = require('../Services/DynamoDBCommandsHelper');
 let client = new DynamoDBClient();
 
 async function onConnect({ queryStringParameters, requestContext: { connectionId } }) {
@@ -7,15 +8,17 @@ async function onConnect({ queryStringParameters, requestContext: { connectionId
     try {
         console.log(`Trying to update player: ${playerId} on Execution: ${executionName}`);
 
-        let command = buildUpdateCommand(executionName, playerId, connectionId);
+        let command = buildUpdateBingoTicketCommand(executionName, playerId, connectionId);
         await updateConnectionId(command);
 
         await notifyBingo({
             data: {
                 bingoExecutionName: executionName,
-                messageType: 'USER_CONNECTED',
-                playerId,
-                playerName,
+                type: 'USER_CONNECTED',
+                player: {
+                    id: playerId,
+                    name: playerName,
+                },
                 connectionId
             }
         });
@@ -39,15 +42,18 @@ async function onDisconnect({ requestContext: { connectionId } }) {
         var player = await getPlayerByConnectionId(connectionId);
 
         console.log(`Trying to diconnect player: ${player.UserName} from Execution: ${player.BingoExecutionName}, ConnectionId: ${connectionId}`);
-        let command = buildUpdateCommand(player.BingoExecutionName, player.PlayerId, 'disconnected');
+        let command = buildUpdateBingoTicketCommand(player.BingoExecutionName, player.PlayerId, 'disconnected');
 
         await updateConnectionId(command);
 
         await notifyBingo({
             data: {
                 bingoExecutionName: player.BingoExecutionName,
-                messageType: 'USER_DISCONNECTED',
-                playerId: player.PlayerId,
+                type: 'USER_DISCONNECTED',
+                player: {
+                    id: player.PlayerId,
+                    name: player.UserName
+                },
                 connectionId
             }
         });
@@ -64,20 +70,6 @@ async function onDisconnect({ requestContext: { connectionId } }) {
             }
         }
     }
-}
-
-function buildUpdateCommand(executionName, playerId, connectionId) {
-    return new UpdateItemCommand({
-        TableName: process.env.TABLE_NAME,
-        Key: {
-            BingoExecutionName: { S: executionName },
-            PlayerId: { S: playerId }
-        },
-        UpdateExpression: "SET ConnectionId = :connectionId",
-        ExpressionAttributeValues: {
-            ":connectionId": { S: connectionId }
-        }
-    });
 }
 
 async function updateConnectionId(command) {

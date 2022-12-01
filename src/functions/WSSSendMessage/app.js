@@ -1,7 +1,12 @@
 const AWS = require('aws-sdk');
-const { DynamoDBClient, ScanCommand, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { buildScanActiveConnectionsCommand, buildUpdateBingoTicketCommand } = require('../Services/DynamoDBCommandsHelper');
 const ddbClient = new DynamoDBClient();
 const STAGE = 'dev';
+const apigwManagementApi = new AWS.ApiGatewayManagementApi({
+    apiVersion: '2018-11-29',
+    endpoint: `${process.env.WEBSOCKET_DOMAN}/${STAGE}`
+});
 
 const getMessagePayload = (event) => {
     if (event.Records) {
@@ -48,7 +53,7 @@ exports.handler = async (event) => {
         } catch (error) {
             if (error.statusCode === 410) {
                 console.error(`Found stale connection, deleting ${ConnectionId}`);
-                await ddbClient.send(buildUpdateCommand(BingoExecutionName, PlayerId, ''));
+                await ddbClient.send(buildUpdateBingoTicketCommand(BingoExecutionName, PlayerId, ''));
             } else {
                 console.error(`Error when trying to send message to connection: ${ConnectionId}-${UserName}`);
                 throw error;
@@ -68,17 +73,7 @@ exports.handler = async (event) => {
 
 async function getActiveConnections(bingoExecutionName) {
     try {
-        let command = new ScanCommand({
-            TableName: process.env.TABLE_NAME,
-            ProjectionExpression: "BingoExecutionName, PlayerId, ConnectionId, UserName",
-            FilterExpression: "BingoExecutionName = :bingoExecutionName AND ConnectionId <> :connectionId",
-            ExpressionAttributeValues: {
-                ":bingoExecutionName": { S: bingoExecutionName },
-                ":connectionId": { S: "disconnected" }
-            }
-        });
-
-        let result = await ddbClient.send(command);
+        let result = await ddbClient.send(buildScanActiveConnectionsCommand(bingoExecutionName));
         return result.Items.map(item => ({
             BingoExecutionName: item.BingoExecutionName.S,
             ConnectionId: item.ConnectionId.S,
@@ -92,24 +87,5 @@ async function getActiveConnections(bingoExecutionName) {
 }
 
 async function sendMessage(params) {
-    const apigwManagementApi = new AWS.ApiGatewayManagementApi({
-        apiVersion: '2018-11-29',
-        endpoint: `${process.env.WEBSOCKET_DOMAN}/${STAGE}`
-    });
     await apigwManagementApi.postToConnection({ ConnectionId: params.connectionId, Data: params.messageData }).promise();
-}
-
-//TODO: duplicated
-function buildUpdateCommand(executionName, playerId, connectionId) {
-    return new UpdateItemCommand({
-        TableName: process.env.TABLE_NAME,
-        Key: {
-            BingoExecutionName: { S: executionName },
-            PlayerId: { S: playerId }
-        },
-        UpdateExpression: "SET ConnectionId = :connectionId",
-        ExpressionAttributeValues: {
-            ":connectionId": { S: connectionId }
-        }
-    });
 }
