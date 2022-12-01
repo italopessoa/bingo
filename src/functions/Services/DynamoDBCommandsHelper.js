@@ -17,8 +17,7 @@ function buildUpdateBingoTicketCommand(executionName, { playerId, playerName }, 
         TableName: process.env.TABLE_NAME,
         Key: {
             BingoExecutionName: { S: executionName },
-            PlayerId: { S: playerId },
-            UserName: { S: playerName }
+            PlayerId: { S: playerId }
         },
         UpdateExpression: "SET ConnectionId = :connectionId, UserName = :userName",
         ExpressionAttributeValues: {

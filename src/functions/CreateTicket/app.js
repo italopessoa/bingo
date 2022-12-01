@@ -24,7 +24,7 @@ async function createTicketAndSendPrivateMessage(newPlayers, executionName) {
             urls: [
                 {
                     label: "Clique aqui para acessar e boa sorte",
-                    link: `http://g1.globo.com/execute/${executionName}/player/${playerId}/ticket/${ticket.join(',')}`
+                    link: `http://g1.globo.com/execute?execution=${executionName}&playerId=${playerId}4&ticket${ticket.join(',')}&playerName=${userName}`
                 }
             ]
         }).buildAndSend();
