@@ -12,6 +12,7 @@ exports.handler = async (state) => {
     }
 }
 
+//TODO review if this function still needed when web app is complete
 async function sendMessageToWinner(player) {
     var body = {
         message: "parabens jovem voce ganhou " + new Date().toISOString(),

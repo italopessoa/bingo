@@ -1,6 +1,5 @@
 const TwitterService = require('../Services/TwitterHelperService');
 
-
 /**
  *
  * State doc: 

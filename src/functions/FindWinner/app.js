@@ -13,6 +13,7 @@ exports.handler = async (state) => {
     };
 };
 
+//TODO review if this function still needed when web app is complete
 async function getWinnerPlayersFromMessages({ lastBallCalledDate, players }) {
     let winners = await TwitterService.searchWinners();
 

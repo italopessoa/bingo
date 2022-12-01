@@ -4,7 +4,7 @@ const DynamoDBService = require('../Services/DynamoDBHelperService');
 const { board, getBingoNumbers } = require('../assets');
 
 exports.handler = async (state) => {
-    await createAndSendTicketMessage(state.newPlayers, state.executionName);
+    await createTicketAndSendPrivateMessage(state.newPlayers, state.executionName);
     return {
         ...state,
         newPlayers: [],
@@ -12,7 +12,7 @@ exports.handler = async (state) => {
     }
 }
 
-async function createAndSendTicketMessage(newPlayers, executionName) {
+async function createTicketAndSendPrivateMessage(newPlayers, executionName) {
     for (let player in newPlayers) {
         const playerId = newPlayers[player];
         const userName = await getTwitterUserName(playerId);
@@ -23,8 +23,8 @@ async function createAndSendTicketMessage(newPlayers, executionName) {
             recipientId: playerId,
             urls: [
                 {
-                    label: "Clique aqui para acessar e boa sorte!",
-                    link: `http://g1.globo.com/execute/${executionName}/player/${playerId}/ticket/${JSON.stringify(ticket)}`
+                    label: "Clique aqui para acessar e boa sorte",
+                    link: `http://g1.globo.com/execute/${executionName}/player/${playerId}/ticket/${ticket.join(',')}`
                 }
             ]
         }).buildAndSend();
@@ -76,6 +76,7 @@ const fillByOrder = (numbers, size, min, max) => {
     }
     return cardColumn;
 }
+
 const fillRandom = (size, min, max) => {
     let list = [];
     do {
