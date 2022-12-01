@@ -12,16 +12,18 @@ function buildScanActiveConnectionsCommand(bingoExecutionName) {
     });
 }
 
-function buildUpdateBingoTicketCommand(executionName, playerId, connectionId) {
+function buildUpdateBingoTicketCommand(executionName, { playerId, playerName }, connectionId) {
     return new UpdateItemCommand({
         TableName: process.env.TABLE_NAME,
         Key: {
             BingoExecutionName: { S: executionName },
-            PlayerId: { S: playerId }
+            PlayerId: { S: playerId },
+            UserName: { S: playerName }
         },
-        UpdateExpression: "SET ConnectionId = :connectionId",
+        UpdateExpression: "SET ConnectionId = :connectionId, UserName = :userName",
         ExpressionAttributeValues: {
-            ":connectionId": { S: connectionId }
+            ":connectionId": { S: connectionId },
+            ":userName": { S: playerName ?? `player-${playerId}` }
         }
     });
 }

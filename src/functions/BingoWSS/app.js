@@ -8,7 +8,7 @@ async function onConnect({ queryStringParameters, requestContext: { connectionId
     try {
         console.log(`Trying to update player: ${playerId} on Execution: ${executionName}`);
 
-        let command = buildUpdateBingoTicketCommand(executionName, playerId, connectionId);
+        let command = buildUpdateBingoTicketCommand(executionName, { playerId, playerName }, connectionId);
         await updateConnectionId(command);
 
         await notifyBingo({
@@ -42,7 +42,7 @@ async function onDisconnect({ requestContext: { connectionId } }) {
         var player = await getPlayerByConnectionId(connectionId);
 
         console.log(`Trying to diconnect player: ${player.UserName} from Execution: ${player.BingoExecutionName}, ConnectionId: ${connectionId}`);
-        let command = buildUpdateBingoTicketCommand(player.BingoExecutionName, player.PlayerId, 'disconnected');
+        let command = buildUpdateBingoTicketCommand(player.BingoExecutionName, { playerId: player.PlayerId }, 'disconnected');
 
         await updateConnectionId(command);
 

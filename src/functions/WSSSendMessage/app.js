@@ -53,7 +53,7 @@ exports.handler = async (event) => {
         } catch (error) {
             if (error.statusCode === 410) {
                 console.error(`Found stale connection, deleting ${ConnectionId}`);
-                await ddbClient.send(buildUpdateBingoTicketCommand(BingoExecutionName, PlayerId, ''));
+                await ddbClient.send(buildUpdateBingoTicketCommand(BingoExecutionName, { playerId: PlayerId, playerName: UserName }, ''));
             } else {
                 console.error(`Error when trying to send message to connection: ${ConnectionId}-${UserName}`);
                 throw error;
