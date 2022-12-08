@@ -40,7 +40,6 @@ exports.handler = async (event) => {
     try {
         connections = await getActiveConnections(snsMessage.bingoExecutionName);
     } catch (error) {
-        console.error("Error when trying to get active connections: ", error);
         return { statusCode: 500, body: 'Error when trying to get active connections' };
     }
 
